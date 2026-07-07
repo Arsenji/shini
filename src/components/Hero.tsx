@@ -1,4 +1,5 @@
 import { useTypewriter } from '../hooks/useTypewriter'
+import { TireTracks } from './TireTracks'
 
 export function Hero() {
   const typed = useTypewriter()
@@ -6,26 +7,26 @@ export function Hero() {
   return (
     <section className="hero">
       <div className="hero__bg">
+        <TireTracks />
         <div className="hero__glow hero__glow--1" />
         <div className="hero__glow hero__glow--2" />
-        <div className="hero__grid" />
       </div>
 
       <div className="container hero__inner">
         <div className="hero__content">
-          <p className="hero__tag">Grip by Design</p>
+          <p className="hero__tag">Шины, диски, шиномонтаж</p>
           <h1 className="hero__title">
-            Премиальные
+            Качественные
             <br />
             <span className="hero__typed">
               {typed}
               <span className="hero__cursor">|</span>
             </span>
             <br />
-            в <strong>Ижевске</strong>
+            по <strong>выгодным ценам</strong>
           </h1>
           <p className="hero__desc">
-            Подбор, продажа и монтаж шин всех классов — от городских седанов до внедорожников.
+            Подбор, продажа и монтаж шин и дисков всех классов — от бюджетных до премиальных.
             Бесплатная консультация и расчёт за 10 минут.
           </p>
           <div className="hero__actions">
@@ -54,7 +55,7 @@ export function Hero() {
               <input type="text" placeholder="16" className="input input--sm" />
             </div>
             <input type="tel" placeholder="+7 (___) ___-__-__" className="input" />
-            <button type="submit" className="btn btn--primary btn--full">
+            <button type="submit" className="btn btn--gold btn--full">
               Получить расчёт
             </button>
           </form>

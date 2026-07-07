@@ -18,6 +18,12 @@ export const services = [
     description: 'Универсальное решение для круглогодичной эксплуатации',
   },
   {
+    id: 'disks',
+    title: 'Диски',
+    subtitle: 'от 3 500 ₽',
+    description: 'Литые и штампованные диски под любой автомобиль',
+  },
+  {
     id: 'mounting',
     title: 'Шиномонтаж',
     subtitle: 'от 800 ₽',
@@ -119,14 +125,14 @@ export const team = [
 ]
 
 export const marqueeItems = [
+  'Шины',
+  'Диски',
+  'Шиномонтаж',
   'Летние шины',
   'Зимние шины',
-  'Всесезонные',
-  'Шиномонтаж',
   'Балансировка',
   'Сезонное хранение',
-  'Ремонт шин',
-  'Подбор по VIN',
+  'Подбор по размеру',
 ]
 
 export const seasonLabels: Record<string, string> = {

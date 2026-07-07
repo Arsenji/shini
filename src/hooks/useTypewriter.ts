@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-const phrases = ['шины', 'сцепление', 'безопасность', 'комфорт']
+const phrases = ['шины', 'диски', 'шиномонтаж', 'выгодно']
 
 export function useTypewriter() {
   const [text, setText] = useState('')

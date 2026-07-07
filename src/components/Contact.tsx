@@ -39,6 +39,7 @@ export function Contact() {
             <option value="" disabled>
               Выберите услугу
             </option>
+            <option>Диски</option>
             <option>Летние шины</option>
             <option>Зимние шины</option>
             <option>Всесезонные шины</option>
@@ -49,7 +50,7 @@ export function Contact() {
           </select>
           <input type="text" placeholder="Размер (205/55 R16)" className="input" />
           <input type="tel" placeholder="+7 (___) ___-__-__" className="input" required />
-          <button type="submit" className="btn btn--primary btn--full">
+          <button type="submit" className="btn btn--gold btn--full">
             Отправить заявку
           </button>
         </form>

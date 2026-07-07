@@ -1,12 +1,14 @@
+import { Logo } from './Logo'
+
 export function Footer() {
   return (
     <footer className="footer">
       <div className="container footer__inner">
         <div className="footer__brand">
-          <a href="#" className="footer__logo">
-            Tire<span>Code</span>
+          <a href="#" className="footer__logo-link">
+            <Logo size="footer" showTagline />
           </a>
-          <p className="footer__copy">© TireCode, all rights reserved.</p>
+          <p className="footer__copy">© КОЛЁСА ДЁШЕВО, все права защищены.</p>
         </div>
 
         <nav className="footer__nav">

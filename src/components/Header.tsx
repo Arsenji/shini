@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Logo } from './Logo'
 
 const navLinks = [
   { href: '#catalog', label: 'Каталог' },
@@ -20,8 +21,8 @@ export function Header() {
   return (
     <header className={`header ${scrolled ? 'header--scrolled' : ''}`}>
       <div className="container header__inner">
-        <a href="#" className="header__logo">
-          Tire<span>Code</span>
+        <a href="#" className="header__logo-link">
+          <Logo />
         </a>
 
         <nav className={`header__nav ${menuOpen ? 'header__nav--open' : ''}`}>
