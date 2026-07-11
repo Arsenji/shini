@@ -26,8 +26,10 @@ export function Hero() {
             по <strong>выгодным ценам</strong>
           </h1>
           <p className="hero__desc">
-            Подбор, продажа и монтаж шин и дисков всех классов — от бюджетных до премиальных.
-            Бесплатная консультация и расчёт за 10 минут.
+            <span className="hero__desc-highlight">
+              Подбор, продажа и монтаж шин и дисков всех классов — от бюджетных до премиальных.{' '}
+              <strong>Бесплатная консультация и расчёт за 10 минут.</strong>
+            </span>
           </p>
           <div className="hero__actions">
             <a href="#contact" className="btn btn--primary">

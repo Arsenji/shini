@@ -16,7 +16,7 @@ export function Catalog() {
       <div className="container">
         <div className="section__header section__header--row">
           <div>
-            <p className="section__tag">Каталог</p>
+            <p className="section__tag section__tag--highlight">Каталог</p>
             <h2 className="section__title">Популярные модели</h2>
           </div>
           <div className="catalog__filters">

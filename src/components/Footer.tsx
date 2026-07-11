@@ -1,4 +1,5 @@
 import { Logo } from './Logo'
+import { VK_URL } from './VkIcon'
 
 export function Footer() {
   return (
@@ -16,19 +17,10 @@ export function Footer() {
           <a href="#services">Услуги</a>
           <a href="#about">Компания</a>
           <a href="#contact">Контакты</a>
+          <a href={VK_URL} target="_blank" rel="noreferrer" aria-label="ВКонтакте">
+            ВКонтакте
+          </a>
         </nav>
-
-        <div className="footer__socials">
-          <a href="https://t.me/" target="_blank" rel="noreferrer" aria-label="Telegram">
-            Telegram
-          </a>
-          <a href="tel:+79120133223" aria-label="Phone">
-            Phone
-          </a>
-          <a href="https://wa.me/" target="_blank" rel="noreferrer" aria-label="WhatsApp">
-            WhatsApp
-          </a>
-        </div>
       </div>
     </footer>
   )

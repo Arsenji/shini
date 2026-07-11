@@ -5,7 +5,7 @@ export function About() {
     <section id="about" className="section about">
       <div className="container about__inner">
         <div className="about__content">
-          <p className="section__tag">О нас</p>
+          <p className="section__tag section__tag--highlight">О нас</p>
           <h2 className="section__title">Надёжные колёса — доступные цены</h2>
           <p className="about__text">
             КОЛЁСА ДЁШЕВО — это магазин шин и дисков, который предлагает полный спектр услуг
@@ -18,8 +18,8 @@ export function About() {
             Работаем с машинами всех классов — от компактных хэтчбеков до премиальных внедорожников.
           </p>
           <div className="about__number">
-            <span className="about__number-value">12 000</span>
-            <span className="about__number-label">комплектов продано</span>
+            <span className="about__number-value">20000+</span>
+            <span className="about__number-label">комплектов шин продано</span>
           </div>
         </div>
 
@@ -31,7 +31,6 @@ export function About() {
               </div>
               <h3 className="team-card__name">{member.name}</h3>
               <p className="team-card__role">{member.role}</p>
-              <p className="team-card__exp">{member.experience}</p>
             </article>
           ))}
         </div>

@@ -5,7 +5,7 @@ export function Services() {
     <section id="services" className="section services">
       <div className="container">
         <div className="section__header">
-          <p className="section__tag">Услуги</p>
+          <p className="section__tag section__tag--highlight">Услуги</p>
           <h2 className="section__title">Всё для ваших колёс</h2>
         </div>
 
