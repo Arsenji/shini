@@ -25,8 +25,12 @@ export function Services() {
         </div>
 
         <div className="services__cta">
-          <a href="#contact" className="btn btn--outline">
-            Посмотреть полный прайс
+          <a
+            href="/preysskurant-uslug-shinomontazha.pdf"
+            className="btn btn--outline"
+            download="Прейскурант на услуги шиномонтажной мастерской.pdf"
+          >
+            Скачать полный прайс услуг
           </a>
         </div>
       </div>

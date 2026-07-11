@@ -12,18 +12,19 @@ export function Hero() {
         <div className="hero__glow hero__glow--2" />
       </div>
 
-      <div className="container hero__inner">
-        <div className="hero__content">
+      <div className="container">
+        <div className="hero__inner">
+          <div className="hero__content">
           <p className="hero__tag">Шины, диски, шиномонтаж</p>
           <h1 className="hero__title">
-            Качественные
-            <br />
-            <span className="hero__typed">
+            <span className="hero__title-line">Качественные</span>
+            <span className="hero__title-line hero__title-line--typed">
               {typed}
               <span className="hero__cursor">|</span>
             </span>
-            <br />
-            по <strong>выгодным ценам</strong>
+            <span className="hero__title-line">
+              по <strong>выгодным ценам</strong>
+            </span>
           </h1>
           <p className="hero__desc">
             <span className="hero__desc-highlight">
@@ -39,15 +40,11 @@ export function Hero() {
               Смотреть каталог
             </a>
           </div>
-        </div>
+          </div>
 
-        <div className="hero__card">
+          <div className="hero__card">
           <div className="hero__card-badge">онлайн подбор</div>
-          <h2 className="hero__card-title">
-            Подбор шин
-            <br />
-            по размеру
-          </h2>
+          <h2 className="hero__card-title">Подбор шин по размеру</h2>
           <form className="hero__form" onSubmit={(e) => e.preventDefault()}>
             <div className="hero__form-row">
               <input type="text" placeholder="Ширина (205)" className="input" />
@@ -64,6 +61,7 @@ export function Hero() {
           <p className="hero__card-note">
             Перезвоним в течение 10 минут и назовём точную цену
           </p>
+          </div>
         </div>
       </div>
 
