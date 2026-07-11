@@ -5,6 +5,7 @@ import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 import { Hero } from './components/Hero'
 import { Marquee } from './components/Marquee'
+import { RequestForm } from './components/RequestForm'
 import { Services } from './components/Services'
 import { Stats } from './components/Stats'
 
@@ -18,6 +19,7 @@ export default function App() {
         <Services />
         <Stats />
         <Catalog />
+        <RequestForm />
         <About />
         <Contact />
       </main>

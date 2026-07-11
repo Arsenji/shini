@@ -493,19 +493,6 @@ select.input {
   flex-wrap: wrap;
 }
 
-.hero__card-badge {
-  display: inline-block;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--navy);
-  background: rgba(201, 160, 53, 0.15);
-  padding: 6px 12px;
-  border-radius: var(--radius-pill);
-  margin-bottom: 20px;
-}
-
 .hero__card-title {
   font-size: 24px;
   font-weight: 800;
@@ -872,6 +859,39 @@ select.input {
   color: #fff;
 }
 
+/* Request */
+.request {
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.request__inner {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.request__header {
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.request__sub {
+  font-size: 16px;
+  color: var(--text-muted);
+  margin-top: 12px;
+}
+
+.request__form {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+}
+
 /* About */
 .about {
   background: rgba(255, 255, 255, 0.3);
@@ -1012,26 +1032,7 @@ select.input {
 }
 
 .contact__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
-  gap: 48px;
-  align-items: start;
-}
-
-.contact__info {
-  min-width: 0;
-}
-
-.contact__form {
-  background: var(--bg-card);
-  border-radius: var(--radius-lg);
-  padding: 36px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  box-shadow: var(--shadow-lg);
-  width: 100%;
-  max-width: 480px;
+  text-align: left;
 }
 
 .contact__details {
@@ -1069,18 +1070,6 @@ a.contact__detail-value:hover {
 .contact .btn--outline:hover {
   background: var(--text-on-dark);
   color: var(--navy);
-}
-
-.contact__form-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--navy);
-}
-
-.contact__form-sub {
-  font-size: 14px;
-  color: var(--text-muted);
-  margin-bottom: 8px;
 }
 
 /* Footer */
@@ -1130,11 +1119,6 @@ a.contact__detail-value:hover {
   .hero__desc {
     max-width: 720px;
   }
-
-  .contact__inner {
-    grid-template-columns: minmax(0, 1fr) 480px;
-    gap: 48px;
-  }
 }
 
 @media (max-width: 1200px) {
@@ -1170,17 +1154,8 @@ a.contact__detail-value:hover {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .about__inner,
-  .contact__inner {
+  .about__inner {
     gap: 40px;
-  }
-
-  .contact__inner {
-    grid-template-columns: 1fr;
-  }
-
-  .contact__form {
-    max-width: none;
   }
 
   .stats__inner {
@@ -1403,7 +1378,7 @@ a.contact__detail-value:hover {
     padding: 16px 18px;
   }
 
-  .contact__form {
+  .request__form {
     padding: 24px 20px;
   }
 

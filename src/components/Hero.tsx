@@ -43,7 +43,7 @@ export function Hero() {
           </div>
 
           <div className="hero__card">
-          <div className="hero__card-badge">онлайн подбор</div>
+          <p className="section__tag section__tag--highlight">Онлайн подбор</p>
           <h2 className="hero__card-title">Подбор шин по размеру</h2>
           <form className="hero__form" onSubmit={(e) => e.preventDefault()}>
             <div className="hero__form-row">
