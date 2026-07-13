@@ -132,15 +132,30 @@ class VKClient:
 
     def send_order_message(self, order: Order) -> tuple[int, int]:
         peer_id = self.settings.vk_peer_id
-        response = self._post(
-            "messages.send",
-            {
-                "peer_id": peer_id,
-                "random_id": order.id,
-                "message": build_order_message(order),
-                "keyboard": build_order_keyboard(order),
-            },
-        )
+        message = build_order_message(order)
+        keyboard = build_order_keyboard(order)
+
+        try:
+            response = self._post(
+                "messages.send",
+                {
+                    "peer_id": peer_id,
+                    "random_id": order.id,
+                    "message": message,
+                    "keyboard": keyboard,
+                },
+            )
+        except RuntimeError as error:
+            logger.warning("VK send with keyboard failed for order %s: %s", order.id, error)
+            response = self._post(
+                "messages.send",
+                {
+                    "peer_id": peer_id,
+                    "random_id": order.id + 1_000_000,
+                    "message": message,
+                },
+            )
+
         return peer_id, int(response)
 
     def edit_order_message(self, order: Order) -> None:

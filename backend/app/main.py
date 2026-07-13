@@ -30,7 +30,11 @@ app.include_router(orders_router)
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok"}
+    vk_ready = settings.vk_configured
+    return {
+        "status": "ok",
+        "vk_configured": "yes" if vk_ready else "no",
+    }
 
 
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"

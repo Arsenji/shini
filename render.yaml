@@ -18,7 +18,7 @@ services:
       - key: VK_API_VERSION
         value: "5.199"
       - key: CORS_ORIGINS
-        value: https://shini.onrender.com
+        value: https://shini-1.onrender.com
 
 databases:
   - name: shini-db

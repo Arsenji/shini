@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -11,6 +12,19 @@ class Settings(BaseSettings):
     )
 
     database_url: str = "postgresql+psycopg://shini:shini@localhost:5432/shini"
+    vk_token: str = ""
+    vk_api_version: str = "5.199"
+    vk_chat_id: str = ""
+    host: str = "0.0.0.0"
+    port: int = 8000
+    cors_origins: str = "http://localhost:5173,https://shini-phi.vercel.app"
+
+    @field_validator("vk_token", "vk_chat_id", mode="before")
+    @classmethod
+    def strip_whitespace(cls, value: object) -> object:
+        if isinstance(value, str):
+            return value.strip()
+        return value
 
     @property
     def sqlalchemy_database_url(self) -> str:
@@ -20,12 +34,6 @@ class Settings(BaseSettings):
         if url.startswith("postgresql://") and "+psycopg" not in url:
             return url.replace("postgresql://", "postgresql+psycopg://", 1)
         return url
-    vk_token: str = ""
-    vk_api_version: str = "5.199"
-    vk_chat_id: str = ""
-    host: str = "0.0.0.0"
-    port: int = 8000
-    cors_origins: str = "http://localhost:5173,https://shini-phi.vercel.app"
 
     @property
     def cors_origin_list(self) -> list[str]:
@@ -33,7 +41,14 @@ class Settings(BaseSettings):
 
     @property
     def vk_peer_id(self) -> int:
-        return 2_000_000_000 + int(self.vk_chat_id)
+        chat_id = int(self.vk_chat_id)
+        if chat_id >= 2_000_000_000:
+            return chat_id
+        return 2_000_000_000 + chat_id
+
+    @property
+    def vk_configured(self) -> bool:
+        return bool(self.vk_token and self.vk_chat_id)
 
 
 @lru_cache

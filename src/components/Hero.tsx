@@ -12,10 +12,12 @@ export function Hero() {
   const [radius, setRadius] = useState('')
   const [phone, setPhone] = useState('')
   const [status, setStatus] = useState<FormStatus>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setStatus('loading')
+    setErrorMessage('')
 
     try {
       await createOrder({
@@ -29,8 +31,9 @@ export function Hero() {
       setProfile('')
       setRadius('')
       setPhone('')
-    } catch {
+    } catch (error) {
       setStatus('error')
+      setErrorMessage(error instanceof Error ? error.message : 'Произошла ошибка. Попробуйте позже.')
     }
   }
 
@@ -120,7 +123,7 @@ export function Hero() {
               />
               {status === 'error' && (
                 <p className="hero__form-feedback hero__form-feedback--error">
-                  Произошла ошибка. Попробуйте позже.
+                  {errorMessage || 'Произошла ошибка. Попробуйте позже.'}
                 </p>
               )}
               <button type="submit" className="btn btn--gold btn--full" disabled={status === 'loading'}>

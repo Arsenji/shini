@@ -20,7 +20,14 @@ export async function createOrder(payload: OrderPayload): Promise<OrderResponse>
   })
 
   if (!response.ok) {
-    throw new Error('Order request failed')
+    let detail = 'Не удалось отправить заявку'
+    try {
+      const data = (await response.json()) as { detail?: string }
+      if (data.detail) detail = data.detail
+    } catch {
+      // ignore invalid JSON
+    }
+    throw new Error(detail)
   }
 
   return response.json() as Promise<OrderResponse>
