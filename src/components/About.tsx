@@ -29,8 +29,10 @@ export function About() {
               <div className="team-card__avatar">
                 {member.name.split(' ').map((n) => n[0]).join('')}
               </div>
-              <h3 className="team-card__name">{member.name}</h3>
-              <p className="team-card__role">{member.role}</p>
+              <div className="team-card__body">
+                <h3 className="team-card__name">{member.name}</h3>
+                <p className="team-card__role">{member.role}</p>
+              </div>
             </article>
           ))}
         </div>

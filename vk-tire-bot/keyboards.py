@@ -5,9 +5,6 @@ from config import SITE_URL, VK_GROUP_URL
 
 def main_keyboard() -> str:
     keyboard = VkKeyboard(one_time=False, inline=False)
-    keyboard.add_button("Подобрать шины", color=VkKeyboardColor.PRIMARY)
-    keyboard.add_button("Помощь", color=VkKeyboardColor.SECONDARY)
-    keyboard.add_line()
     keyboard.add_openlink_button("Наш сайт", link=SITE_URL)
     keyboard.add_openlink_button("Группа VK", link=VK_GROUP_URL)
     return keyboard.get_keyboard()

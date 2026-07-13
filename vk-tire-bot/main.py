@@ -1,3 +1,4 @@
+import json
 import logging
 import random
 import time
@@ -24,6 +25,18 @@ def get_keyboard(keyboard_type: str | None) -> str | None:
     if keyboard_type == "size_hint":
         return size_hint_keyboard()
     return main_keyboard()
+
+
+def is_start_message(message: dict) -> bool:
+    payload = message.get("payload")
+    if not payload:
+        return False
+    try:
+        data = json.loads(payload)
+    except (TypeError, json.JSONDecodeError):
+        return False
+    command = str(data.get("command", "")).lower()
+    return command in {"start", "начать"}
 
 
 def send_message(vk, user_id: int, text: str, keyboard: str | None = None) -> None:
@@ -73,7 +86,7 @@ def run_bot() -> None:
         logger.info("Сообщение от %s: %s", user_id, text)
 
         try:
-            if message.get("action", {}).get("type") == "chat_invite_user":
+            if message.get("action", {}).get("type") == "chat_invite_user" or is_start_message(message):
                 reply, keyboard_type = WELCOME_TEXT, "main"
             else:
                 reply, keyboard_type = handle_message(text)
