@@ -19,7 +19,7 @@ def create_order(payload: OrderCreate, db: Session = Depends(get_db)) -> OrderCr
     if not settings.vk_configured:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="VK не настроен: задайте VK_TOKEN и VK_CHAT_ID на сервере",
+            detail="VK не настроен: задайте VK_TOKEN и VK_PEER_ID (или VK_CHAT_ID) на сервере",
         )
 
     service = OrderService(db)

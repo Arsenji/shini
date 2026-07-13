@@ -15,6 +15,8 @@ services:
         sync: false
       - key: VK_CHAT_ID
         value: "197"
+      - key: VK_PEER_ID
+        sync: false
       - key: VK_API_VERSION
         value: "5.199"
       - key: CORS_ORIGINS
