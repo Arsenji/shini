@@ -20,6 +20,7 @@ class Order(Base):
     __tablename__ = "orders"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    customer_name: Mapped[str | None] = mapped_column(String(64), nullable=True)
     width: Mapped[int] = mapped_column(Integer, nullable=False)
     profile: Mapped[int] = mapped_column(Integer, nullable=False)
     radius: Mapped[int] = mapped_column(Integer, nullable=False)

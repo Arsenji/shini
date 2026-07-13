@@ -1110,8 +1110,12 @@ a.contact__detail-value:hover {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  flex-wrap: wrap;
+  gap: 20px;
+  flex-wrap: nowrap;
+}
+
+.footer__brand {
+  flex-shrink: 0;
 }
 
 .footer__logo-link {
@@ -1119,47 +1123,31 @@ a.contact__detail-value:hover {
 }
 
 .footer__copy {
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.5);
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .footer__nav {
   display: flex;
-  gap: 24px;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+  flex-wrap: nowrap;
+  flex: 1;
+  min-width: 0;
 }
 
 .footer__nav a {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: rgba(255, 255, 255, 0.6);
   transition: var(--transition);
+  white-space: nowrap;
 }
 
 .footer__nav a:hover {
   color: var(--gold);
-}
-
-.footer__docs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: flex-end;
-}
-
-.footer__doc-btn {
-  border-color: rgba(255, 255, 255, 0.28);
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 13px;
-  padding: 10px 16px;
-  min-height: 42px;
-}
-
-.footer__doc-btn:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-  background: transparent;
 }
 
 /* Responsive */
@@ -1173,11 +1161,27 @@ a.contact__detail-value:hover {
   .hero__inner {
     gap: 40px;
   }
+
+  .footer__nav {
+    gap: 12px;
+  }
+
+  .footer__nav a {
+    font-size: 11px;
+  }
 }
 
 @media (max-width: 1024px) {
   .section {
     padding: 72px 0;
+  }
+
+  .footer__nav {
+    gap: 10px;
+  }
+
+  .footer__nav a {
+    font-size: 10.5px;
   }
 
   .hero {
@@ -1451,6 +1455,7 @@ a.contact__detail-value:hover {
     flex-direction: column;
     text-align: center;
     gap: 20px;
+    flex-wrap: wrap;
   }
 
   .footer__brand {
@@ -1462,17 +1467,11 @@ a.contact__detail-value:hover {
   .footer__nav {
     flex-wrap: wrap;
     justify-content: center;
-    gap: 16px 20px;
+    gap: 12px 14px;
   }
 
-  .footer__docs {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .footer__doc-btn {
-    width: 100%;
-    justify-content: center;
+  .footer__nav a {
+    font-size: 12px;
   }
 
   .logo--footer .logo__img {

@@ -20,24 +20,13 @@ export function Footer() {
           <a href={VK_URL} target="_blank" rel="noreferrer" aria-label="ВКонтакте">
             ВКонтакте
           </a>
-        </nav>
-
-        <div className="footer__docs">
-          <a
-            href="/dogovor-podryada-2026.pdf"
-            className="btn btn--outline footer__doc-btn"
-            download
-          >
+          <a href="/dogovor-podryada-2026.pdf" download>
             Скачать договор подряда
           </a>
-          <a
-            href="/dogovor-postavki-2026.pdf"
-            className="btn btn--outline footer__doc-btn"
-            download
-          >
+          <a href="/dogovor-postavki-2026.pdf" download>
             Скачать договор поставки
           </a>
-        </div>
+        </nav>
       </div>
     </footer>
   )

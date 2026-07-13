@@ -1,6 +1,7 @@
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
 export type OrderPayload = {
+  name: string
   width: number
   profile: number
   radius: number

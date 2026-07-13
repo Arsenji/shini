@@ -85,29 +85,30 @@ except ValueError:
     check("phone invalid raises", True)
 
 try:
-    OrderCreate(width=50, profile=55, radius=16, phone="+79991234567")
+    OrderCreate(name="Иван", width=50, profile=55, radius=16, phone="+79991234567")
     check("width bounds", False)
 except ValidationError:
     check("width bounds", True)
 
 try:
-    OrderCreate(width=205, profile=10, radius=16, phone="+79991234567")
+    OrderCreate(name="Иван", width=205, profile=10, radius=16, phone="+79991234567")
     check("profile bounds", False)
 except ValidationError:
     check("profile bounds", True)
 
 try:
-    OrderCreate(width=205, profile=55, radius=5, phone="+79991234567")
+    OrderCreate(name="Иван", width=205, profile=55, radius=5, phone="+79991234567")
     check("radius bounds", False)
 except ValidationError:
     check("radius bounds", True)
 
-ok = OrderCreate(width=205, profile=55, radius=16, phone="8 (999) 123-45-67")
+ok = OrderCreate(name="Иван", width=205, profile=55, radius=16, phone="8 (999) 123-45-67")
 check("valid OrderCreate", ok.phone == "+79991234567")
 
 # --- Message / keyboard ---
 order = Order(
     id=15,
+    customer_name="Иван",
     width=205,
     profile=55,
     radius=16,
@@ -119,6 +120,7 @@ order = Order(
 msg = build_order_message(order)
 check("message has title", "🚗 Новая заявка" in msg)
 check("message has order id", "Заявка №15" in msg)
+check("message has customer name", "Иван" in msg)
 check("message has size", "205/55 R16" in msg)
 check("message has phone", "+7 (999) 123-45-67" in msg)
 check("message has status new", "🟡 Новая" in msg)
@@ -156,7 +158,7 @@ class FakeVK:
 db = TestingSessionLocal()
 vk = FakeVK()
 service = OrderService(db, vk_client=vk)
-created = service.create_order(205, 55, 16, "+79991234567")
+created = service.create_order("Иван", 205, 55, 16, "+79991234567")
 check("create order id", created.id is not None and created.id > 0)
 check("create status NEW", created.status == OrderStatus.NEW)
 check("vk message sent", vk.sent == [created.id])
@@ -177,7 +179,7 @@ except ValueError:
     check("cannot re-take done", True)
 
 # second order for cancel path
-created2 = service.create_order(215, 60, 16, "+79990001122")
+created2 = service.create_order("Петр", 215, 60, 16, "+79990001122")
 service.update_status(created2.id, OrderStatus.IN_PROGRESS, "Петр", 456)
 canceled = service.update_status(created2.id, OrderStatus.CANCELED)
 check("canceled status", canceled.status == OrderStatus.CANCELED)
@@ -199,7 +201,7 @@ check("GET /health", health.status_code == 200 and health.json()["status"] == "o
 
 resp = client.post(
     "/api/orders",
-    json={"width": 205, "profile": 55, "radius": 16, "phone": "+79991234567"},
+    json={"name": "Иван", "width": 205, "profile": 55, "radius": 16, "phone": "+79991234567"},
 )
 check("POST /api/orders 201", resp.status_code == 201, f"got {resp.status_code} {resp.text}")
 body = resp.json() if resp.status_code == 201 else {}
@@ -208,13 +210,13 @@ check("POST order_id present", isinstance(body.get("order_id"), int), str(body))
 
 bad = client.post(
     "/api/orders",
-    json={"width": 10, "profile": 55, "radius": 16, "phone": "+79991234567"},
+    json={"name": "Иван", "width": 10, "profile": 55, "radius": 16, "phone": "+79991234567"},
 )
 check("POST invalid width 422", bad.status_code == 422)
 
 bad_phone = client.post(
     "/api/orders",
-    json={"width": 205, "profile": 55, "radius": 16, "phone": "abc"},
+    json={"name": "Иван", "width": 205, "profile": 55, "radius": 16, "phone": "abc"},
 )
 check("POST invalid phone 422", bad_phone.status_code == 422)
 
@@ -232,7 +234,7 @@ class ServiceWithBrokenVK(OrderService):
 orders_api.OrderService = ServiceWithBrokenVK
 vk_fail = client.post(
     "/api/orders",
-    json={"width": 205, "profile": 55, "radius": 16, "phone": "+79993334455"},
+    json={"name": "Иван", "width": 205, "profile": 55, "radius": 16, "phone": "+79993334455"},
 )
 check("POST VK failure 502", vk_fail.status_code == 502, f"got {vk_fail.status_code} {vk_fail.text}")
 orders_api.OrderService = ServiceWithFakeVK
@@ -259,7 +261,7 @@ vk_api_mock.users.get.return_value = [{"first_name": "Иван", "last_name": "�
 # create fresh NEW order for callback
 db2 = TestingSessionLocal()
 svc2 = OrderService(db2, vk_client=FakeVK())
-order_for_cb = svc2.create_order(195, 65, 15, "+79001112233")
+order_for_cb = svc2.create_order("Иван", 195, 65, 15, "+79001112233")
 db2.close()
 
 result = handle_order_callback(
@@ -293,7 +295,7 @@ check("callback done text", f"Заявка №{order_for_cb.id} завершен
 # double take should fail gracefully
 db4 = TestingSessionLocal()
 svc4 = OrderService(db4, vk_client=FakeVK())
-order_dup = svc4.create_order(205, 55, 16, "+79991112233")
+order_dup = svc4.create_order("Иван", 205, 55, 16, "+79991112233")
 svc4.update_status(order_dup.id, OrderStatus.IN_PROGRESS, "А", 1)
 db4.close()
 result_dup = handle_order_callback(

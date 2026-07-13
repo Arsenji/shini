@@ -25,6 +25,7 @@ def create_order(payload: OrderCreate, db: Session = Depends(get_db)) -> OrderCr
     service = OrderService(db)
     try:
         order = service.create_order(
+            name=payload.name,
             width=payload.width,
             profile=payload.profile,
             radius=payload.radius,

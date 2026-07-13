@@ -36,3 +36,36 @@ export function parseTireNumber(value: string): number | null {
   if (!/^\d{2,3}$/.test(value)) return null
   return Number(value)
 }
+
+const NAME_ALLOWED_PATTERN = /^[\p{L}\p{M}\s.'-]+$/u
+
+export function sanitizeNameInput(value: string, maxLength = 40): string {
+  return value.replace(/\s+/g, ' ').slice(0, maxLength)
+}
+
+export function validateName(value: string): string | null {
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  if (trimmed.length > 40) return null
+  if (!NAME_ALLOWED_PATTERN.test(trimmed)) return null
+  return trimmed
+}
+
+export function parseTireSizeLabel(value: string): { width: number; profile: number; radius: number } | null {
+  const raw = value.trim().toLowerCase()
+  if (!raw) return null
+
+  // Примеры:
+  // 205/55 r16
+  // 205 55 r16
+  // 205/55/16
+  const match = raw.match(/(\d{3})\D+(\d{2})\D*(?:r)?\D*(\d{2})/)
+  if (!match) return null
+
+  const width = Number(match[1])
+  const profile = Number(match[2])
+  const radius = Number(match[3])
+
+  if (!Number.isFinite(width) || !Number.isFinite(profile) || !Number.isFinite(radius)) return null
+  return { width, profile, radius }
+}

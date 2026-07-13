@@ -43,6 +43,10 @@ def build_order_message(order: Order) -> str:
         "",
         f"Заявка №{order.id}",
         "",
+        "Имя:",
+        "",
+        (order.customer_name or "—"),
+        "",
         "Размер:",
         "",
         order.size_label,
@@ -179,8 +183,9 @@ class OrderService:
         self.db = db
         self.vk = vk_client or VKClient()
 
-    def create_order(self, width: int, profile: int, radius: int, phone: str) -> Order:
+    def create_order(self, name: str, width: int, profile: int, radius: int, phone: str) -> Order:
         order = Order(
+            customer_name=name,
             width=width,
             profile=profile,
             radius=radius,

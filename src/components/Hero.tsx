@@ -1,13 +1,14 @@
 import { FormEvent, useState } from 'react'
 import { useTypewriter } from '../hooks/useTypewriter'
 import { createOrder } from '../api/orders'
-import { digitsOnly, parseTireNumber, sanitizePhoneInput } from '../lib/sanitize'
+import { digitsOnly, parseTireNumber, sanitizeNameInput, sanitizePhoneInput, validateName } from '../lib/sanitize'
 import { TireTracks } from './TireTracks'
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error'
 
 export function Hero() {
   const typed = useTypewriter()
+  const [name, setName] = useState('')
   const [width, setWidth] = useState('')
   const [profile, setProfile] = useState('')
   const [radius, setRadius] = useState('')
@@ -20,10 +21,17 @@ export function Hero() {
     setStatus('loading')
     setErrorMessage('')
 
+    const safeName = validateName(name)
     const safeWidth = parseTireNumber(width)
     const safeProfile = parseTireNumber(profile)
     const safeRadius = parseTireNumber(radius)
     const safePhone = sanitizePhoneInput(phone)
+
+    if (!safeName) {
+      setStatus('error')
+      setErrorMessage('Укажите имя (только буквы), например «Иван»')
+      return
+    }
 
     if (safeWidth === null || safeProfile === null || safeRadius === null) {
       setStatus('error')
@@ -33,12 +41,14 @@ export function Hero() {
 
     try {
       await createOrder({
+        name: safeName,
         width: safeWidth,
         profile: safeProfile,
         radius: safeRadius,
         phone: safePhone,
       })
       setStatus('success')
+      setName('')
       setWidth('')
       setProfile('')
       setRadius('')
@@ -97,6 +107,14 @@ export function Hero() {
             </div>
           ) : (
             <form className="hero__form" onSubmit={handleSubmit}>
+              <input
+                type="text"
+                placeholder="Имя"
+                className="input"
+                value={name}
+                onChange={(e) => setName(sanitizeNameInput(e.target.value))}
+                required
+              />
               <div className="hero__form-row">
                 <input
                   type="text"
