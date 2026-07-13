@@ -76,6 +76,18 @@ def run_bot() -> None:
     logger.info("Бот запущен. GROUP_ID=%s", VK_GROUP_ID)
 
     for event in longpoll.listen():
+        if event.type == VkBotEventType.MESSAGE_EVENT:
+            try:
+                from order_handlers import answer_callback, handle_order_callback
+
+                result_text = handle_order_callback(vk, event.object)
+                answer_callback(vk, event.object, result_text)
+            except ApiError as error:
+                logger.error("VK callback error [%s]: %s", error.code, error)
+            except Exception:
+                logger.exception("Ошибка обработки callback")
+            continue
+
         if event.type != VkBotEventType.MESSAGE_NEW:
             continue
 

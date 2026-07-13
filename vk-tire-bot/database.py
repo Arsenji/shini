@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from sqlalchemy import Column, Integer, String, create_engine, select
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 
-from config import DATABASE_URL
+from config import TIRES_DATABASE_URL
 
 
 class Base(DeclarativeBase):
@@ -48,7 +48,7 @@ class TireOffer:
         return labels.get(self.season, self.season)
 
 
-engine = create_engine(DATABASE_URL, echo=False)
+engine = create_engine(TIRES_DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(bind=engine)
 
 

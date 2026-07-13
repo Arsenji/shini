@@ -8,3 +8,9 @@ vk-tire-bot/.env
 vk-tire-bot/tires.db
 vk-tire-bot/__pycache__/
 vk-tire-bot/.venv/
+
+# Backend
+backend/.env
+backend/.venv/
+backend/__pycache__/
+backend/**/__pycache__/
