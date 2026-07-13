@@ -11,6 +11,15 @@ class Settings(BaseSettings):
     )
 
     database_url: str = "postgresql+psycopg://shini:shini@localhost:5432/shini"
+
+    @property
+    def sqlalchemy_database_url(self) -> str:
+        url = self.database_url
+        if url.startswith("postgres://"):
+            return url.replace("postgres://", "postgresql+psycopg://", 1)
+        if url.startswith("postgresql://") and "+psycopg" not in url:
+            return url.replace("postgresql://", "postgresql+psycopg://", 1)
+        return url
     vk_token: str = ""
     vk_api_version: str = "5.199"
     vk_chat_id: str = ""
