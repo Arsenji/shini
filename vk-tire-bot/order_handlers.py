@@ -6,6 +6,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 BACKEND_PATH = Path(__file__).resolve().parent.parent / "backend"
+if not (BACKEND_PATH / "app").is_dir():
+    # Docker: backend лежит в /app, бот в /app/vk-tire-bot
+    BACKEND_PATH = Path(__file__).resolve().parent.parent
 BOT_ENV = Path(__file__).resolve().parent / ".env"
 if str(BACKEND_PATH) not in sys.path:
     sys.path.insert(0, str(BACKEND_PATH))

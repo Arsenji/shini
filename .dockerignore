@@ -5,8 +5,10 @@ dist
 **/.env
 **/.venv
 **/__pycache__
-vk-tire-bot
 backend/.env
 backend/.venv
+vk-tire-bot/.env
+vk-tire-bot/.venv
+vk-tire-bot/tires.db
 *.md
 .DS_Store
