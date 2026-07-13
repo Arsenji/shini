@@ -9,16 +9,38 @@ from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy.dialects import postgresql
 
 revision: str = "001"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+ORDER_STATUS = postgresql.ENUM(
+    "NEW",
+    "IN_PROGRESS",
+    "DONE",
+    "CANCELED",
+    name="order_status",
+    create_type=False,
+)
+
 
 def upgrade() -> None:
-    order_status = sa.Enum("NEW", "IN_PROGRESS", "DONE", "CANCELED", name="order_status")
-    order_status.create(op.get_bind(), checkfirst=True)
+    op.execute(
+        """
+        DO $$ BEGIN
+            CREATE TYPE order_status AS ENUM ('NEW', 'IN_PROGRESS', 'DONE', 'CANCELED');
+        EXCEPTION
+            WHEN duplicate_object THEN NULL;
+        END $$;
+        """
+    )
+
+    bind = op.get_bind()
+    inspector = sa.inspect(bind)
+    if "orders" in inspector.get_table_names():
+        return
 
     op.create_table(
         "orders",
@@ -27,7 +49,12 @@ def upgrade() -> None:
         sa.Column("profile", sa.Integer(), nullable=False),
         sa.Column("radius", sa.Integer(), nullable=False),
         sa.Column("phone", sa.String(length=20), nullable=False),
-        sa.Column("status", order_status, nullable=False),
+        sa.Column(
+            "status",
+            ORDER_STATUS,
+            nullable=False,
+            server_default="NEW",
+        ),
         sa.Column("manager_name", sa.String(length=255), nullable=True),
         sa.Column("manager_vk_id", sa.BigInteger(), nullable=True),
         sa.Column("vk_message_id", sa.Integer(), nullable=True),
@@ -40,4 +67,4 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_table("orders")
-    sa.Enum(name="order_status").drop(op.get_bind(), checkfirst=True)
+    op.execute("DROP TYPE IF EXISTS order_status")
