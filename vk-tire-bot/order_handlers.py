@@ -1,15 +1,19 @@
 import json
+import os
 import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 BACKEND_PATH = Path(__file__).resolve().parent.parent / "backend"
+BOT_ENV = Path(__file__).resolve().parent / ".env"
 if str(BACKEND_PATH) not in sys.path:
     sys.path.insert(0, str(BACKEND_PATH))
 
-load_dotenv(BACKEND_PATH / ".env")
-load_dotenv(Path(__file__).resolve().parent / ".env")
+load_dotenv(BOT_ENV)
+load_dotenv(BACKEND_PATH / ".env", override=True)
+if not os.getenv("VK_TOKEN", "").strip() and BOT_ENV.exists():
+    load_dotenv(BOT_ENV, override=True)
 
 import logging
 
