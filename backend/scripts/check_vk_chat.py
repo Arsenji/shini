@@ -59,7 +59,7 @@ def main() -> int:
 
     print("\n2) Проверяю доступ к сообщениям...")
     try:
-        conv = vk_call("messages.getConversations", count=20, filter="all")
+        conv = vk_call("messages.getConversations", count=40, filter="all")
         items = conv.get("items", [])
         print(f"   Найдено диалогов: {len(items)}")
     except Exception as error:
@@ -67,35 +67,44 @@ def main() -> int:
         print("   Включите сообщения сообщества и права токена messages.")
         return 1
 
+    print("\n   Все диалоги сообщества:")
     chats = []
     for item in items:
-        peer = item["conversation"]["peer"]
-        peer_id = peer["id"]
-        if peer_id < 2_000_000_000:
-            continue
-        chat_local_id = peer_id - 2_000_000_000
-        title = item["conversation"].get("chat_settings", {}).get("title", "без названия")
-        chats.append((chat_local_id, peer_id, title))
+        conversation = item.get("conversation", {})
+        peer = conversation.get("peer", {})
+        peer_id = peer.get("id", 0)
+        peer_type = peer.get("type", "?")
+        if peer_id >= 2_000_000_000:
+            chat_local_id = peer_id - 2_000_000_000
+            title = conversation.get("chat_settings", {}).get("title", "без названия")
+            chats.append((chat_local_id, peer_id, title))
+            print(f"   • беседа «{title}» → VK_CHAT_ID={chat_local_id}")
+        elif peer_type == "user":
+            print(f"   • личный чат с пользователем peer_id={peer_id}")
+        elif peer_type == "group":
+            print(f"   • диалог с сообществом peer_id={peer_id}")
+        else:
+            print(f"   • {peer_type} peer_id={peer_id}")
 
     send_test = len(sys.argv) > 1 and sys.argv[1] == "--send-test"
     send_test_chat_id = int(sys.argv[2]) if send_test and len(sys.argv) > 2 else None
 
     print("\n3) Беседы, где есть сообщество:")
     if not chats:
-        print("   В списке диалогов бесед не видно.")
-        if send_test_chat_id is not None:
-            print(f"   Пробую отправить тест в VK_CHAT_ID={send_test_chat_id}...")
-        else:
-            print("   Добавьте сообщество в чат менеджеров или запустите:")
-            print("   python scripts/check_vk_chat.py --send-test 197")
+        print("   Бесед нет — сообщество ещё не состоит ни в одной беседе.")
+        print("   Важно: добавлять нужно именно сообщество (через ссылку invite),")
+        print("   а не личного бота. После добавления напишите в беседе любое")
+        print("   сообщение сообществу / упомяните его.")
+        if send_test_chat_id is None:
             return 2
+        print(f"   Пробую отправить тест в VK_CHAT_ID={send_test_chat_id}...")
     else:
         for chat_local_id, peer_id, title in chats:
             print(f"   • «{title}»")
             print(f"     VK_CHAT_ID={chat_local_id}")
             print(f"     peer_id={peer_id}")
 
-        print("\n4) Что прописать в backend/.env:")
+        print("\n4) Что прописать в backend/.env и на Render:")
         print("   VK_TOKEN=...ваш токен...")
         print(f"   VK_CHAT_ID={chats[0][0]}")
         print(f"   VK_API_VERSION={VK_API_VERSION}")

@@ -1141,6 +1141,27 @@ a.contact__detail-value:hover {
   color: var(--gold);
 }
 
+.footer__docs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.footer__doc-btn {
+  border-color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  padding: 10px 16px;
+  min-height: 42px;
+}
+
+.footer__doc-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: transparent;
+}
+
 /* Responsive */
 @media (min-width: 1025px) {
   .hero__desc {
@@ -1442,6 +1463,16 @@ a.contact__detail-value:hover {
     flex-wrap: wrap;
     justify-content: center;
     gap: 16px 20px;
+  }
+
+  .footer__docs {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .footer__doc-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .logo--footer .logo__img {

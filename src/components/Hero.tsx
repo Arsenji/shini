@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react'
 import { useTypewriter } from '../hooks/useTypewriter'
 import { createOrder } from '../api/orders'
+import { digitsOnly, parseTireNumber, sanitizePhoneInput } from '../lib/sanitize'
 import { TireTracks } from './TireTracks'
 
 type FormStatus = 'idle' | 'loading' | 'success' | 'error'
@@ -19,12 +20,23 @@ export function Hero() {
     setStatus('loading')
     setErrorMessage('')
 
+    const safeWidth = parseTireNumber(width)
+    const safeProfile = parseTireNumber(profile)
+    const safeRadius = parseTireNumber(radius)
+    const safePhone = sanitizePhoneInput(phone)
+
+    if (safeWidth === null || safeProfile === null || safeRadius === null) {
+      setStatus('error')
+      setErrorMessage('Укажите размер шины цифрами, например 205 / 55 R16')
+      return
+    }
+
     try {
       await createOrder({
-        width: Number(width),
-        profile: Number(profile),
-        radius: Number(radius),
-        phone,
+        width: safeWidth,
+        profile: safeProfile,
+        radius: safeRadius,
+        phone: safePhone,
       })
       setStatus('success')
       setWidth('')
@@ -88,37 +100,52 @@ export function Hero() {
               <div className="hero__form-row">
                 <input
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="off"
+                  maxLength={3}
                   placeholder="Ширина (205)"
                   className="input"
                   value={width}
-                  onChange={(e) => setWidth(e.target.value)}
+                  onChange={(e) => setWidth(digitsOnly(e.target.value, 3))}
                   required
                 />
                 <span className="hero__form-sep">/</span>
                 <input
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="off"
+                  maxLength={2}
                   placeholder="Профиль (55)"
                   className="input"
                   value={profile}
-                  onChange={(e) => setProfile(e.target.value)}
+                  onChange={(e) => setProfile(digitsOnly(e.target.value, 2))}
                   required
                 />
                 <span className="hero__form-sep">R</span>
                 <input
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="off"
+                  maxLength={2}
                   placeholder="16"
                   className="input input--sm"
                   value={radius}
-                  onChange={(e) => setRadius(e.target.value)}
+                  onChange={(e) => setRadius(digitsOnly(e.target.value, 2))}
                   required
                 />
               </div>
               <input
                 type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                maxLength={12}
                 placeholder="+7 (___) ___-__-__"
                 className="input"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(sanitizePhoneInput(e.target.value))}
                 required
               />
               {status === 'error' && (

@@ -12,7 +12,7 @@ export function Footer() {
           <p className="footer__copy">© КОЛЁСА ДЁШЕВО, все права защищены.</p>
         </div>
 
-        <nav className="footer__nav">
+        <nav className="footer__nav" aria-label="Навигация">
           <a href="#catalog">Каталог</a>
           <a href="#services">Услуги</a>
           <a href="#about">Компания</a>
@@ -21,6 +21,23 @@ export function Footer() {
             ВКонтакте
           </a>
         </nav>
+
+        <div className="footer__docs">
+          <a
+            href="/dogovor-podryada-2026.pdf"
+            className="btn btn--outline footer__doc-btn"
+            download
+          >
+            Скачать договор подряда
+          </a>
+          <a
+            href="/dogovor-postavki-2026.pdf"
+            className="btn btn--outline footer__doc-btn"
+            download
+          >
+            Скачать договор поставки
+          </a>
+        </div>
       </div>
     </footer>
   )
