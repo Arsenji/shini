@@ -7,16 +7,10 @@ services:
     plan: free
     healthCheckPath: /health
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: shini-db
-          property: connectionString
       - key: VK_TOKEN
         sync: false
       - key: VK_GROUP_ID
         value: "237597670"
-      - key: VK_CHAT_ID
-        value: "197"
       - key: VK_PEER_ID
         sync: false
       - key: VK_API_VERSION
@@ -25,9 +19,3 @@ services:
         value: https://shini-1.onrender.com
       - key: SITE_URL
         value: https://shini-1.onrender.com
-
-databases:
-  - name: shini-db
-    plan: free
-    databaseName: shini
-    user: shini

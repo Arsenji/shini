@@ -1,17 +1,30 @@
-import json
 import logging
+import random
+from dataclasses import dataclass
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import httpx
-from sqlalchemy.orm import Session
 
 from app.config import Settings, get_settings
-from app.models.order import Order, OrderStatus
 
 logger = logging.getLogger(__name__)
 
 MSK = ZoneInfo("Europe/Moscow")
+
+
+@dataclass
+class OrderData:
+    name: str
+    width: int
+    profile: int
+    radius: int
+    phone: str
+    created_at: datetime
+
+    @property
+    def size_label(self) -> str:
+        return f"{self.width}/{self.profile} R{self.radius}"
 
 
 def format_phone_display(phone: str) -> str:
@@ -27,88 +40,28 @@ def format_datetime(dt: datetime) -> str:
     return dt.astimezone(MSK).strftime("%d.%m.%Y %H:%M")
 
 
-def status_emoji(status: OrderStatus) -> str:
-    mapping = {
-        OrderStatus.NEW: "🟡 Новая",
-        OrderStatus.IN_PROGRESS: "🟢 В работе",
-        OrderStatus.DONE: "✅ Завершена",
-        OrderStatus.CANCELED: "❌ Отказ",
-    }
-    return mapping[status]
-
-
-def build_order_message(order: Order) -> str:
-    lines = [
-        "🚗 Новая заявка",
-        "",
-        f"Заявка №{order.id}",
-        "",
-        "Имя:",
-        "",
-        (order.customer_name or "—"),
-        "",
-        "Размер:",
-        "",
-        order.size_label,
-        "",
-        "Телефон:",
-        "",
-        format_phone_display(order.phone),
-        "",
-        "Время:",
-        "",
-        format_datetime(order.created_at),
-        "",
-        "Статус:",
-        "",
-        status_emoji(order.status),
-    ]
-
-    if order.status == OrderStatus.IN_PROGRESS and order.manager_name:
-        lines.extend(["", "Менеджер:", "", order.manager_name])
-
-    return "\n".join(lines)
-
-
-def build_order_keyboard(order: Order) -> str:
-    buttons: list[dict] = []
-    payload_prefix = {"order_id": order.id}
-
-    if order.status == OrderStatus.NEW:
-        buttons.append(
-            {
-                "action": {
-                    "type": "callback",
-                    "label": "🟢 Взять в работу",
-                    "payload": json.dumps({**payload_prefix, "action": "take"}, ensure_ascii=False),
-                },
-                "color": "positive",
-            }
-        )
-    elif order.status == OrderStatus.IN_PROGRESS:
-        buttons.extend(
-            [
-                {
-                    "action": {
-                        "type": "callback",
-                        "label": "✅ Завершено",
-                        "payload": json.dumps({**payload_prefix, "action": "done"}, ensure_ascii=False),
-                    },
-                    "color": "positive",
-                },
-                {
-                    "action": {
-                        "type": "callback",
-                        "label": "❌ Отказ",
-                        "payload": json.dumps({**payload_prefix, "action": "cancel"}, ensure_ascii=False),
-                    },
-                    "color": "negative",
-                },
-            ]
-        )
-
-    keyboard = {"inline": True, "buttons": [buttons] if buttons else []}
-    return json.dumps(keyboard, ensure_ascii=False)
+def build_order_message(order: OrderData) -> str:
+    return "\n".join(
+        [
+            "🚗 Новая заявка",
+            "",
+            "Имя:",
+            "",
+            order.name,
+            "",
+            "Размер:",
+            "",
+            order.size_label,
+            "",
+            "Телефон:",
+            "",
+            format_phone_display(order.phone),
+            "",
+            "Время:",
+            "",
+            format_datetime(order.created_at),
+        ]
+    )
 
 
 class VKClient:
@@ -134,122 +87,36 @@ class VKClient:
 
         return data["response"]
 
-    def send_order_message(self, order: Order) -> tuple[int, int]:
-        peer_id = self.settings.vk_peer_id
-        message = build_order_message(order)
-        keyboard = build_order_keyboard(order)
-
-        try:
-            response = self._post(
-                "messages.send",
-                {
-                    "peer_id": peer_id,
-                    "random_id": order.id,
-                    "message": message,
-                    "keyboard": keyboard,
-                },
-            )
-        except RuntimeError as error:
-            logger.warning("VK send with keyboard failed for order %s: %s", order.id, error)
-            response = self._post(
-                "messages.send",
-                {
-                    "peer_id": peer_id,
-                    "random_id": order.id + 1_000_000,
-                    "message": message,
-                },
-            )
-
-        return peer_id, int(response)
-
-    def edit_order_message(self, order: Order) -> None:
-        if not order.vk_message_id or not order.vk_peer_id:
-            logger.warning("Order %s has no VK message metadata", order.id)
-            return
-
+    def send_order_message(self, order: OrderData) -> None:
         self._post(
-            "messages.edit",
+            "messages.send",
             {
-                "peer_id": order.vk_peer_id,
-                "message_id": order.vk_message_id,
+                "peer_id": self.settings.vk_peer_id,
+                "random_id": random.randint(1, 2_000_000_000),
                 "message": build_order_message(order),
-                "keyboard": build_order_keyboard(order),
             },
         )
 
 
 class OrderService:
-    def __init__(self, db: Session, vk_client: VKClient | None = None) -> None:
-        self.db = db
+    def __init__(self, vk_client: VKClient | None = None) -> None:
         self.vk = vk_client or VKClient()
 
-    def create_order(self, name: str, width: int, profile: int, radius: int, phone: str) -> Order:
-        order = Order(
-            customer_name=name,
+    def create_order(self, name: str, width: int, profile: int, radius: int, phone: str) -> OrderData:
+        order = OrderData(
+            name=name,
             width=width,
             profile=profile,
             radius=radius,
             phone=phone,
-            status=OrderStatus.NEW,
+            created_at=datetime.now(MSK),
         )
-        self.db.add(order)
-        self.db.commit()
-        self.db.refresh(order)
-        logger.info("Order created: id=%s size=%s phone=%s", order.id, order.size_label, order.phone)
+        logger.info("Sending order to VK: size=%s phone=%s", order.size_label, order.phone)
 
         try:
-            peer_id, message_id = self.vk.send_order_message(order)
-            order.vk_peer_id = peer_id
-            order.vk_message_id = message_id
-            self.db.commit()
-            self.db.refresh(order)
-            logger.info("VK message sent for order %s (message_id=%s)", order.id, message_id)
+            self.vk.send_order_message(order)
         except Exception as error:
-            logger.exception("Failed to send VK message for order %s", order.id)
-            raise RuntimeError(f"VK send failed for order {order.id}") from error
-
-        return order
-
-    def update_status(
-        self,
-        order_id: int,
-        status: OrderStatus,
-        manager_name: str | None = None,
-        manager_vk_id: int | None = None,
-    ) -> Order:
-        order = self.db.get(Order, order_id)
-        if order is None:
-            raise ValueError(f"Заявка №{order_id} не найдена")
-
-        if status == OrderStatus.IN_PROGRESS and order.status != OrderStatus.NEW:
-            raise ValueError("Заявка уже взята в работу")
-
-        if status in {OrderStatus.DONE, OrderStatus.CANCELED} and order.status != OrderStatus.IN_PROGRESS:
-            raise ValueError("Заявку можно завершить только из статуса «В работе»")
-
-        order.status = status
-        if manager_name is not None:
-            order.manager_name = manager_name
-        if manager_vk_id is not None:
-            order.manager_vk_id = manager_vk_id
-
-        self.db.commit()
-        self.db.refresh(order)
-        logger.info(
-            "Order %s status updated to %s (manager=%s)",
-            order.id,
-            order.status.value,
-            order.manager_name,
-        )
-
-        try:
-            self.vk.edit_order_message(order)
-        except Exception:
-            # Статус уже сохранён — не откатываем и не роняем callback у менеджера
-            logger.exception(
-                "Failed to edit VK message for order %s (status already saved as %s)",
-                order.id,
-                order.status.value,
-            )
+            logger.exception("Failed to send VK message")
+            raise RuntimeError("VK send failed") from error
 
         return order

@@ -1,10 +1,9 @@
 import logging
+import time
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException, status
 
 from app.config import get_settings
-from app.database.session import get_db
 from app.schemas.order import OrderCreate, OrderCreateResponse
 from app.services.order_service import OrderService
 
@@ -14,7 +13,7 @@ router = APIRouter(prefix="/api/orders", tags=["orders"])
 
 
 @router.post("", response_model=OrderCreateResponse, status_code=status.HTTP_201_CREATED)
-def create_order(payload: OrderCreate, db: Session = Depends(get_db)) -> OrderCreateResponse:
+def create_order(payload: OrderCreate) -> OrderCreateResponse:
     settings = get_settings()
     if not settings.vk_configured:
         raise HTTPException(
@@ -22,9 +21,9 @@ def create_order(payload: OrderCreate, db: Session = Depends(get_db)) -> OrderCr
             detail="VK не настроен: задайте VK_TOKEN и VK_PEER_ID (или VK_CHAT_ID) на сервере",
         )
 
-    service = OrderService(db)
+    service = OrderService()
     try:
-        order = service.create_order(
+        service.create_order(
             name=payload.name,
             width=payload.width,
             profile=payload.profile,
@@ -37,11 +36,5 @@ def create_order(payload: OrderCreate, db: Session = Depends(get_db)) -> OrderCr
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=str(error),
         ) from error
-    except Exception as error:
-        logger.exception("Database failure while creating order")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Ошибка сохранения заявки",
-        ) from error
 
-    return OrderCreateResponse(order_id=order.id)
+    return OrderCreateResponse(order_id=int(time.time()))
