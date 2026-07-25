@@ -733,17 +733,266 @@ select.input {
 }
 
 /* Catalog */
+.catalog {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.catalog__subtitle {
+  margin-top: 12px;
+  font-size: 15px;
+  color: var(--text-muted);
+}
+
 .catalog__filters {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  margin-bottom: 0;
+}
+
+.catalog__size-panel {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.catalog__field-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.catalog__season-toggle {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.catalog__season-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 140px;
+  padding: 12px 18px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.catalog__season-btn + .catalog__season-btn {
+  border-left: 1px solid var(--border);
+}
+
+.catalog__season-btn:hover:not(.catalog__season-btn--active) {
+  background: rgba(27, 45, 69, 0.06);
+  color: var(--navy);
+}
+
+.catalog__season-btn--active {
+  background: var(--bg-elevated);
+  color: var(--navy);
+}
+
+.catalog__season-btn--active:hover {
+  background: var(--bg-elevated);
+  color: var(--navy);
+}
+
+.catalog__season-icon--summer {
+  color: #e67e22;
+}
+
+.catalog__season-icon--winter {
+  color: #3b82c4;
+}
+
+.catalog__dims {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.catalog__dim {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.catalog__select {
+  width: 100%;
+  appearance: none;
+  padding: 12px 40px 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background-color: #fff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234A6278' d='M1.4.6 6 5.2 10.6.6 12 2 6 8 0 2z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  color: var(--navy);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.catalog__select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 160, 53, 0.15);
+}
+
+.catalog__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.catalog__search {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: min(100%, 280px);
+  flex: 1;
+  max-width: 320px;
+}
+
+.catalog__search-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.catalog__size-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 0;
+}
+
+.catalog__chip {
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--navy);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.catalog__chip:hover:not(.catalog__chip--active) {
+  border-color: var(--navy);
+}
+
+.catalog__chip--active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.catalog__chip--active:hover {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.catalog__empty {
+  padding: 40px 24px;
+  text-align: center;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  box-shadow: var(--shadow);
+}
+
+.catalog__pagination {
+  margin-top: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.catalog__pagination-info {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.catalog__pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.catalog__page-btn {
+  min-width: 40px;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--navy);
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.catalog__page-btn:hover:not(:disabled):not(.catalog__page-btn--active) {
+  border-color: var(--navy);
+}
+
+.catalog__page-btn--active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.catalog__page-btn--active:hover {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.catalog__page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .catalog__filter {
   padding: 10px 20px;
   border-radius: var(--radius-pill);
-  border: 2px solid var(--navy);
-  background: transparent;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
   color: var(--navy);
   font-family: var(--font);
   font-size: 13px;
@@ -752,11 +1001,17 @@ select.input {
   transition: var(--transition);
 }
 
-.catalog__filter:hover {
-  background: rgba(27, 45, 69, 0.08);
+.catalog__filter:hover:not(.catalog__filter--active) {
+  border-color: var(--navy);
 }
 
 .catalog__filter--active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+
+.catalog__filter--active:hover {
   background: var(--navy);
   border-color: var(--navy);
   color: #fff;
@@ -768,21 +1023,23 @@ select.input {
   gap: 20px;
 }
 
-.tire-card {
+.shop-card {
   background: var(--bg-card);
   border-radius: var(--radius-lg);
   overflow: hidden;
   transition: var(--transition);
   position: relative;
   box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
 }
 
-.tire-card:hover {
+.shop-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
 }
 
-.tire-card__badge {
+.shop-card__badge {
   position: absolute;
   top: 16px;
   left: 16px;
@@ -797,81 +1054,106 @@ select.input {
   border-radius: var(--radius-pill);
 }
 
-.tire-card__visual {
-  height: 180px;
+.shop-card__visual {
+  height: 168px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg-card) 100%);
 }
 
-.tire-card__tire {
+.shop-card__illustration {
   width: 120px;
   height: 120px;
-  position: relative;
 }
 
-.tire-card__tire-outer {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 18px solid var(--navy);
-  box-shadow: inset 0 0 20px rgba(27, 45, 69, 0.2);
+.shop-card__info {
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
-.tire-card__tire-inner {
-  position: absolute;
-  inset: 30px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--gold-light), var(--gold));
-  border: 1px solid var(--navy);
+.shop-card__meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
 }
 
-.tire-card__info {
-  padding: 24px;
-}
-
-.tire-card__season {
+.shop-card__category,
+.shop-card__season {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
 }
 
-.tire-card__brand {
+.shop-card__season {
+  color: var(--gold);
+}
+
+.shop-card__brand {
   font-size: 18px;
   font-weight: 800;
-  margin: 4px 0 2px;
   color: var(--navy);
+  line-height: 1.2;
 }
 
-.tire-card__model {
+.shop-card__model {
   font-size: 14px;
   color: var(--text-muted);
-  margin-bottom: 4px;
+  margin: 2px 0 8px;
 }
 
-.tire-card__size {
+.shop-card__size {
+  font-size: 13px;
+  color: var(--navy);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.shop-card__sizes {
+  margin-bottom: 16px;
   font-size: 13px;
   color: var(--text-muted);
-  font-family: monospace;
-  margin-bottom: 16px;
 }
 
-.tire-card__footer {
+.shop-card__sizes summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--navy);
+  list-style: none;
+}
+
+.shop-card__sizes summary::-webkit-details-marker {
+  display: none;
+}
+
+.shop-card__sizes ul {
+  margin-top: 8px;
+  padding-left: 16px;
+  display: grid;
+  gap: 4px;
+}
+
+.shop-card__footer {
+  margin-top: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
 }
 
-.tire-card__price {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--navy);
+.shop-card__price-note {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
 }
 
-.tire-card__btn {
+.shop-card__btn {
   font-size: 13px;
   font-weight: 700;
   padding: 8px 16px;
@@ -879,11 +1161,55 @@ select.input {
   border: 2px solid var(--navy);
   color: var(--navy);
   transition: var(--transition);
+  white-space: nowrap;
 }
 
-.tire-card__btn:hover {
+.shop-card__btn:hover {
   background: var(--navy);
   color: #fff;
+}
+
+@media (max-width: 1024px) {
+  .catalog__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .catalog__toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .catalog__search {
+    max-width: none;
+  }
+
+  .catalog__dims {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog__season-toggle {
+    width: 100%;
+  }
+
+  .catalog__season-btn {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .catalog__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog__pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .catalog__pagination-controls {
+    justify-content: center;
+  }
 }
 
 /* Request */
@@ -917,6 +1243,61 @@ select.input {
   gap: 12px;
   box-shadow: var(--shadow-lg);
   width: 100%;
+}
+
+.request__interest {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  background: rgba(27, 45, 69, 0.06);
+  border: 1px solid var(--border);
+}
+
+.request__interest-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.request__interest-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.request__interest-meta,
+.request__interest-sizes {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.request__interest-sizes {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.request__interest-clear {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.request__interest-clear:hover {
+  color: var(--navy);
 }
 
 /* About */
@@ -1513,13 +1894,13 @@ a.contact__detail-value:hover {
     gap: 8px;
   }
 
-  .tire-card__footer {
+  .shop-card__footer {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
 
-  .tire-card__btn {
+  .shop-card__btn {
     width: 100%;
     text-align: center;
     min-height: 44px;

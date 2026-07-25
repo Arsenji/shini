@@ -12,7 +12,6 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    database_url: str = "postgresql+psycopg://shini:shini@localhost:5432/shini"
     vk_token: str = ""
     vk_api_version: str = "5.199"
     vk_chat_id: str = ""
@@ -32,15 +31,6 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return value.strip()
         return value
-
-    @property
-    def sqlalchemy_database_url(self) -> str:
-        url = self.database_url
-        if url.startswith("postgres://"):
-            return url.replace("postgres://", "postgresql+psycopg://", 1)
-        if url.startswith("postgresql://") and "+psycopg" not in url:
-            return url.replace("postgresql://", "postgresql+psycopg://", 1)
-        return url
 
     @property
     def cors_origin_list(self) -> list[str]:

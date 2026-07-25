@@ -1,13 +1,41 @@
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { createOrder } from '../api/orders'
+import { shopCategoryLabels, shopSeasonLabels, type ShopCategory, type ShopSeason } from '../data/shop'
+import {
+  clearOrderInterest,
+  getOrderInterest,
+  ORDER_INTEREST_EVENT,
+  type OrderInterest,
+} from '../lib/orderInterest'
 import { parseTireSizeLabel, sanitizeNameInput, sanitizePhoneInput, validateName } from '../lib/sanitize'
 
 export function RequestForm() {
   const [name, setName] = useState('')
   const [size, setSize] = useState('')
   const [phone, setPhone] = useState('')
+  const [interest, setInterest] = useState<OrderInterest | null>(() => getOrderInterest())
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+
+  useEffect(() => {
+    function onInterest(event: Event) {
+      const detail = (event as CustomEvent<OrderInterest | null>).detail
+      setInterest(detail)
+      if (detail?.preferredSize) {
+        setSize(detail.preferredSize)
+        setStatus('idle')
+        setErrorMessage('')
+      }
+    }
+
+    window.addEventListener(ORDER_INTEREST_EVENT, onInterest)
+    return () => window.removeEventListener(ORDER_INTEREST_EVENT, onInterest)
+  }, [])
+
+  function clearInterest() {
+    clearOrderInterest()
+    setInterest(null)
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -29,6 +57,7 @@ export function RequestForm() {
     }
 
     const safePhone = sanitizePhoneInput(phone)
+    const currentInterest = interest ?? getOrderInterest()
 
     try {
       await createOrder({
@@ -37,16 +66,33 @@ export function RequestForm() {
         profile: parsed.profile,
         radius: parsed.radius,
         phone: safePhone,
+        size_label: size.trim(),
+        brand: currentInterest?.brand,
+        model: currentInterest?.model,
+        category: currentInterest?.category,
+        season: currentInterest?.season,
+        sizes: currentInterest?.sizes.join(', '),
+        product_id: currentInterest?.productId,
       })
       setStatus('success')
       setName('')
       setSize('')
       setPhone('')
+      clearOrderInterest()
+      setInterest(null)
     } catch (error) {
       setStatus('error')
       setErrorMessage(error instanceof Error ? error.message : 'Произошла ошибка. Попробуйте позже.')
     }
   }
+
+  const categoryLabel = interest
+    ? shopCategoryLabels[interest.category as ShopCategory] ?? interest.category
+    : null
+  const seasonLabel =
+    interest?.season && interest.season in shopSeasonLabels
+      ? shopSeasonLabels[interest.season as ShopSeason]
+      : null
 
   return (
     <section id="request" className="section request">
@@ -64,6 +110,30 @@ export function RequestForm() {
           </div>
         ) : (
           <form className="request__form" onSubmit={handleSubmit}>
+            {interest && (
+              <div className="request__interest">
+                <div className="request__interest-body">
+                  <p className="request__interest-label">Вы выбрали</p>
+                  <p className="request__interest-title">
+                    {interest.brand} {interest.model}
+                  </p>
+                  <p className="request__interest-meta">
+                    {[categoryLabel, seasonLabel].filter(Boolean).join(' · ')}
+                  </p>
+                  <p className="request__interest-sizes">
+                    {interest.sizeGroup
+                      ? interest.sizeGroup
+                      : interest.sizes.length <= 4
+                        ? interest.sizes.join(' · ')
+                        : `${interest.sizes.slice(0, 4).join(' · ')} +${interest.sizes.length - 4}`}
+                  </p>
+                </div>
+                <button type="button" className="request__interest-clear" onClick={clearInterest}>
+                  Сбросить
+                </button>
+              </div>
+            )}
+
             <input
               type="text"
               placeholder="Имя"

@@ -28,8 +28,15 @@ class OrderCreate(BaseModel):
     name: Annotated[str, Field(min_length=2, max_length=40)]
     width: Annotated[int, Field(ge=100, le=395)]
     profile: Annotated[int, Field(ge=20, le=95)]
-    radius: Annotated[int, Field(ge=10, le=30)]
+    radius: Annotated[float, Field(ge=10, le=30)]
     phone: Annotated[str, Field(min_length=10, max_length=32)]
+    size_label: Annotated[str | None, Field(default=None, max_length=64)] = None
+    brand: Annotated[str | None, Field(default=None, max_length=64)] = None
+    model: Annotated[str | None, Field(default=None, max_length=64)] = None
+    category: Annotated[str | None, Field(default=None, max_length=32)] = None
+    season: Annotated[str | None, Field(default=None, max_length=32)] = None
+    sizes: Annotated[str | None, Field(default=None, max_length=500)] = None
+    product_id: Annotated[str | None, Field(default=None, max_length=80)] = None
 
     @field_validator("name")
     @classmethod
@@ -43,6 +50,15 @@ class OrderCreate(BaseModel):
     @classmethod
     def validate_phone(cls, value: str) -> str:
         return normalize_phone(value.strip())
+
+    @field_validator("size_label", "brand", "model", "category", "season", "sizes", "product_id", mode="before")
+    @classmethod
+    def empty_str_to_none(cls, value: object) -> object:
+        if isinstance(value, str) and not value.strip():
+            return None
+        if isinstance(value, str):
+            return value.strip()
+        return value
 
 
 class OrderCreateResponse(BaseModel):

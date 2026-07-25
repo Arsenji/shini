@@ -6,6 +6,13 @@ export type OrderPayload = {
   profile: number
   radius: number
   phone: string
+  size_label?: string
+  brand?: string
+  model?: string
+  category?: string
+  season?: string
+  sizes?: string
+  product_id?: string
 }
 
 export type OrderResponse = {
@@ -24,7 +31,7 @@ export async function createOrder(payload: OrderPayload): Promise<OrderResponse>
     let detail = 'Не удалось отправить заявку'
     try {
       const data = (await response.json()) as { detail?: string }
-      if (data.detail) detail = data.detail
+      if (data.detail) detail = typeof data.detail === 'string' ? data.detail : 'Не удалось отправить заявку'
     } catch {
       // ignore invalid JSON
     }

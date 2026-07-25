@@ -74,6 +74,25 @@ check("message has size", "205/55 R16" in msg)
 check("message has phone", "+7 (999) 123-45-67" in msg)
 check("message has no status", "Статус" not in msg)
 
+order_with_product = OrderData(
+    name="Иван",
+    width=185,
+    profile=75,
+    radius=16,
+    phone="+79991234567",
+    created_at=datetime(2026, 7, 13, 17, 45),
+    size_label="185/75R16C",
+    brand="Кама",
+    model="НК-243",
+    category="lcv",
+    sizes="185/75R16C",
+    product_id="kama-nk243-185-75r16c",
+)
+product_msg = build_order_message(order_with_product)
+check("message has product", "Кама НК-243" in product_msg)
+check("message has category", "Легкогрузовые" in product_msg)
+check("message has size label", "185/75R16C" in product_msg)
+
 
 class FakeVK:
     def __init__(self) -> None:

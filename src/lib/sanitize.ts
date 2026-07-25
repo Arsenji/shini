@@ -52,14 +52,15 @@ export function validateName(value: string): string | null {
 }
 
 export function parseTireSizeLabel(value: string): { width: number; profile: number; radius: number } | null {
-  const raw = value.trim().toLowerCase()
+  const raw = value.trim().toLowerCase().replace(/,/g, '.')
   if (!raw) return null
 
   // Примеры:
   // 205/55 r16
   // 205 55 r16
-  // 205/55/16
-  const match = raw.match(/(\d{3})\D+(\d{2})\D*(?:r)?\D*(\d{2})/)
+  // 185/75R16C
+  // 215/75R17.5
+  const match = raw.match(/(\d{3})\D+(\d{2,3})\D*(?:r)?\D*(\d{2}(?:\.\d)?)/)
   if (!match) return null
 
   const width = Number(match[1])

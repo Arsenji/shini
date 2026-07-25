@@ -12,19 +12,41 @@ logger = logging.getLogger(__name__)
 
 MSK = ZoneInfo("Europe/Moscow")
 
+CATEGORY_LABELS = {
+    "passenger": "Легковые",
+    "lcv": "Легкогрузовые",
+    "truck": "Грузовые",
+}
+
+SEASON_LABELS = {
+    "summer": "Лето",
+    "winter": "Зима",
+    "allseason": "Всесезон",
+}
+
 
 @dataclass
 class OrderData:
     name: str
     width: int
     profile: int
-    radius: int
+    radius: float
     phone: str
     created_at: datetime
+    size_label: str | None = None
+    brand: str | None = None
+    model: str | None = None
+    category: str | None = None
+    season: str | None = None
+    sizes: str | None = None
+    product_id: str | None = None
 
     @property
-    def size_label(self) -> str:
-        return f"{self.width}/{self.profile} R{self.radius}"
+    def display_size(self) -> str:
+        if self.size_label:
+            return self.size_label
+        radius = int(self.radius) if float(self.radius).is_integer() else self.radius
+        return f"{self.width}/{self.profile} R{radius}"
 
 
 def format_phone_display(phone: str) -> str:
@@ -41,18 +63,66 @@ def format_datetime(dt: datetime) -> str:
 
 
 def build_order_message(order: OrderData) -> str:
-    return "\n".join(
+    lines = [
+        "🚗 Новая заявка",
+        "",
+        "Имя:",
+        "",
+        order.name,
+        "",
+    ]
+
+    if order.brand or order.model:
+        lines.extend(
+            [
+                "Товар:",
+                "",
+                f"{order.brand or ''} {order.model or ''}".strip(),
+                "",
+            ]
+        )
+
+    if order.category:
+        lines.extend(
+            [
+                "Тип:",
+                "",
+                CATEGORY_LABELS.get(order.category, order.category),
+                "",
+            ]
+        )
+
+    if order.season:
+        lines.extend(
+            [
+                "Сезон:",
+                "",
+                SEASON_LABELS.get(order.season, order.season),
+                "",
+            ]
+        )
+
+    lines.extend(
         [
-            "🚗 Новая заявка",
-            "",
-            "Имя:",
-            "",
-            order.name,
-            "",
             "Размер:",
             "",
-            order.size_label,
+            order.display_size,
             "",
+        ]
+    )
+
+    if order.sizes:
+        lines.extend(
+            [
+                "Доступные размеры:",
+                "",
+                order.sizes,
+                "",
+            ]
+        )
+
+    lines.extend(
+        [
             "Телефон:",
             "",
             format_phone_display(order.phone),
@@ -62,6 +132,8 @@ def build_order_message(order: OrderData) -> str:
             format_datetime(order.created_at),
         ]
     )
+
+    return "\n".join(lines)
 
 
 class VKClient:
@@ -102,7 +174,22 @@ class OrderService:
     def __init__(self, vk_client: VKClient | None = None) -> None:
         self.vk = vk_client or VKClient()
 
-    def create_order(self, name: str, width: int, profile: int, radius: int, phone: str) -> OrderData:
+    def create_order(
+        self,
+        name: str,
+        width: int,
+        profile: int,
+        radius: float,
+        phone: str,
+        *,
+        size_label: str | None = None,
+        brand: str | None = None,
+        model: str | None = None,
+        category: str | None = None,
+        season: str | None = None,
+        sizes: str | None = None,
+        product_id: str | None = None,
+    ) -> OrderData:
         order = OrderData(
             name=name,
             width=width,
@@ -110,8 +197,20 @@ class OrderService:
             radius=radius,
             phone=phone,
             created_at=datetime.now(MSK),
+            size_label=size_label,
+            brand=brand,
+            model=model,
+            category=category,
+            season=season,
+            sizes=sizes,
+            product_id=product_id,
         )
-        logger.info("Sending order to VK: size=%s phone=%s", order.size_label, order.phone)
+        logger.info(
+            "Sending order to VK: product=%s size=%s phone=%s",
+            f"{brand or ''} {model or ''}".strip() or "-",
+            order.display_size,
+            order.phone,
+        )
 
         try:
             self.vk.send_order_message(order)

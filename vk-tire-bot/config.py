@@ -13,12 +13,6 @@ VK_TOKEN = os.getenv("VK_TOKEN", "")
 # ID сообщества без минуса, например 123456789
 VK_GROUP_ID = int(os.getenv("VK_GROUP_ID", "0"))
 
-# PostgreSQL для заявок (общая БД с backend)
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+psycopg://shini:shini@localhost:5432/shini",
-)
-
 # SQLite для каталога шин в боте
 TIRES_DATABASE_URL = os.getenv("TIRES_DATABASE_URL", f"sqlite:///{BASE_DIR / 'tires.db'}")
 

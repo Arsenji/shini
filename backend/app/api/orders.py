@@ -29,6 +29,13 @@ def create_order(payload: OrderCreate) -> OrderCreateResponse:
             profile=payload.profile,
             radius=payload.radius,
             phone=payload.phone,
+            size_label=payload.size_label,
+            brand=payload.brand,
+            model=payload.model,
+            category=payload.category,
+            season=payload.season,
+            sizes=payload.sizes,
+            product_id=payload.product_id,
         )
     except RuntimeError as error:
         logger.exception("VK API failure while creating order")
