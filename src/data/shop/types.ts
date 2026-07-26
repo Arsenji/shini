@@ -28,8 +28,17 @@ export type ShopProduct = {
    * (например "185/75R16C", "215/75R17.5")
    */
   sizeGroup?: string
-  /** Какая иллюстрация показывать */
+  /** Какая SVG-иллюстрация показывать, если нет image */
   imageKey: ShopImageKey
+  /**
+   * Фото шины, например "/tires/kumho-es31.webp"
+   * Файлы кладите в public/tires/
+   */
+  image?: string | null
+  /**
+   * Цена в рублях. Если пусто / null — на карточке «Цена по запросу»
+   */
+  price?: number | null
   badge?: string | null
 }
 

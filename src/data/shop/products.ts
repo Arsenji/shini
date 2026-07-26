@@ -10,8 +10,8 @@ import type { ShopProduct } from './types'
  * 4. category: 'passenger' | 'lcv' | 'truck'
  * 5. imageKey обычно совпадает с category
  * 6. Для коммерческих укажите sizeGroup (общий размер линейки)
- *
- * Цены не хранятся — заявка уходит менеджеру в VK.
+ * 7. image: путь к фото, например '/tires/kumho-es31.webp' (файл в public/tires/)
+ * 8. price: число в рублях; если не указать — «Цена по запросу»
  */
 export const shopProducts: ShopProduct[] = [
   // ─── Легковые ───────────────────────────────────────────
@@ -22,6 +22,7 @@ export const shopProducts: ShopProduct[] = [
     category: 'passenger',
     season: 'summer',
     imageKey: 'passenger',
+    image: '/tires/kumho-es31.webp',
     badge: 'Хит',
     sizes: [
       '195/65R15',
@@ -42,6 +43,7 @@ export const shopProducts: ShopProduct[] = [
     category: 'passenger',
     season: 'summer',
     imageKey: 'passenger',
+    image: '/tires/landsail-ls388.webp',
     sizes: [
       '205/55R16',
       '205/60R16',
@@ -65,6 +67,7 @@ export const shopProducts: ShopProduct[] = [
     category: 'passenger',
     season: 'summer',
     imageKey: 'passenger',
+    image: '/tires/delinte-ds2.webp',
     sizes: [
       '195/60R15',
       '205/55R16',
@@ -87,6 +90,7 @@ export const shopProducts: ShopProduct[] = [
     category: 'passenger',
     season: 'summer',
     imageKey: 'passenger',
+    image: '/tires/viatti-v130.png',
     sizes: ['185/65R15', '175/65R14', '175/70R13'],
   },
   {
@@ -96,6 +100,7 @@ export const shopProducts: ShopProduct[] = [
     category: 'passenger',
     season: 'summer',
     imageKey: 'passenger',
+    image: '/tires/viatti-v134.jpg',
     sizes: ['195/65R15', '185/60R14'],
   },
   {
@@ -105,6 +110,7 @@ export const shopProducts: ShopProduct[] = [
     category: 'passenger',
     season: 'summer',
     imageKey: 'passenger',
+    image: '/tires/viatti-v237.jpg',
     sizes: ['215/65R16', '245/70R16', '205/75R16'],
   },
   {
@@ -114,6 +120,7 @@ export const shopProducts: ShopProduct[] = [
     category: 'passenger',
     season: 'summer',
     imageKey: 'passenger',
+    image: '/tires/formula-energy.jpg',
     badge: 'Топ',
     sizes: [
       '195/65R15',
@@ -138,6 +145,7 @@ export const shopProducts: ShopProduct[] = [
     model: 'НК-243',
     category: 'lcv',
     imageKey: 'lcv',
+    image: '/tires/kama-nk243.jpg',
     sizeGroup: '185/75R16C',
     sizes: ['185/75R16C'],
   },
@@ -147,6 +155,7 @@ export const shopProducts: ShopProduct[] = [
     model: 'TR646',
     category: 'lcv',
     imageKey: 'lcv',
+    image: '/tires/triangle-tr646.webp',
     sizeGroup: '185/75R16C',
     sizes: ['185/75R16C'],
   },
@@ -156,6 +165,7 @@ export const shopProducts: ShopProduct[] = [
     model: 'Tracvan',
     category: 'lcv',
     imageKey: 'lcv',
+    image: '/tires/three-a-tracvan.webp',
     sizeGroup: '185/75R16C',
     sizes: ['185/75R16C'],
   },
@@ -165,6 +175,7 @@ export const shopProducts: ShopProduct[] = [
     model: 'CP321',
     category: 'lcv',
     imageKey: 'lcv',
+    image: '/tires/roadstone-cp321.webp',
     sizeGroup: '185/75R16C',
     sizes: ['185/75R16C'],
   },
@@ -174,6 +185,7 @@ export const shopProducts: ShopProduct[] = [
     model: 'Partner',
     category: 'lcv',
     imageKey: 'lcv',
+    image: '/tires/landrock-partner.webp',
     sizeGroup: '185/75R16C',
     sizes: ['185/75R16C'],
   },
@@ -221,6 +233,7 @@ export const shopProducts: ShopProduct[] = [
     model: 'Partner',
     category: 'lcv',
     imageKey: 'lcv',
+    image: '/tires/landrock-partner.webp',
     sizeGroup: '195/75R16C',
     sizes: ['195/75R16C'],
   },
@@ -248,6 +261,7 @@ export const shopProducts: ShopProduct[] = [
     model: 'CP321',
     category: 'lcv',
     imageKey: 'lcv',
+    image: '/tires/roadstone-cp321.webp',
     sizeGroup: '195/75R16C',
     sizes: ['195/75R16C'],
   },

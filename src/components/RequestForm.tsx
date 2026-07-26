@@ -11,7 +11,7 @@ import { parseTireSizeLabel, sanitizeNameInput, sanitizePhoneInput, validateName
 
 export function RequestForm() {
   const [name, setName] = useState('')
-  const [size, setSize] = useState('')
+  const [size, setSize] = useState(() => getOrderInterest()?.preferredSize ?? '')
   const [phone, setPhone] = useState('')
   const [interest, setInterest] = useState<OrderInterest | null>(() => getOrderInterest())
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -25,6 +25,8 @@ export function RequestForm() {
         setSize(detail.preferredSize)
         setStatus('idle')
         setErrorMessage('')
+      } else if (detail === null) {
+        setSize('')
       }
     }
 
@@ -35,6 +37,7 @@ export function RequestForm() {
   function clearInterest() {
     clearOrderInterest()
     setInterest(null)
+    setSize('')
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {

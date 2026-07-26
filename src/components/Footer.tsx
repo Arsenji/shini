@@ -17,6 +17,7 @@ export function Footer() {
           <a href="#services">Услуги</a>
           <a href="#about">Компания</a>
           <a href="#contact">Контакты</a>
+          <a href="#public-offer">Публичная оферта</a>
           <a href={VK_URL} target="_blank" rel="noreferrer" aria-label="ВКонтакте">
             ВКонтакте
           </a>

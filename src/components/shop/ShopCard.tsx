@@ -11,10 +11,16 @@ type ShopCardProps = {
   product: ShopProduct
 }
 
+function formatPrice(price: number): string {
+  return `${price.toLocaleString('ru-RU')} ₽`
+}
+
 export function ShopCard({ product }: ShopCardProps) {
   const categoryLabel = shopCategoryLabels[product.category]
   const seasonLabel = product.season ? shopSeasonLabels[product.season] : null
   const sizeHeadline = product.sizeGroup ?? formatSizeList(product.sizes, 3)
+  const hasPrice = typeof product.price === 'number' && product.price > 0
+  const hasImage = Boolean(product.image)
 
   function handleOrderClick() {
     setOrderInterest(productToOrderInterest(product))
@@ -25,7 +31,16 @@ export function ShopCard({ product }: ShopCardProps) {
       {product.badge && <span className="shop-card__badge">{product.badge}</span>}
 
       <div className="shop-card__visual">
-        <TireIllustration imageKey={product.imageKey} className="shop-card__illustration" />
+        {hasImage ? (
+          <img
+            src={product.image!}
+            alt={`${product.brand} ${product.model}`}
+            className="shop-card__photo"
+            loading="lazy"
+          />
+        ) : (
+          <TireIllustration imageKey={product.imageKey} className="shop-card__illustration" />
+        )}
       </div>
 
       <div className="shop-card__info">
@@ -50,7 +65,9 @@ export function ShopCard({ product }: ShopCardProps) {
         )}
 
         <div className="shop-card__footer">
-          <span className="shop-card__price-note">Цена по запросу</span>
+          <span className={hasPrice ? 'shop-card__price' : 'shop-card__price-note'}>
+            {hasPrice ? formatPrice(product.price!) : 'Цена по запросу'}
+          </span>
           <a href="#request" className="shop-card__btn" onClick={handleOrderClick}>
             Заказать
           </a>

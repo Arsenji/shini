@@ -13,7 +13,7 @@ import {
 import { ShopCard } from './shop/ShopCard'
 
 const categoryFilters: ShopCategoryFilter[] = ['all', 'passenger', 'lcv', 'truck']
-const PAGE_SIZE = 10
+const PAGE_SIZE = 12
 
 const emptySizeFilters: ShopSizeFilters = {
   width: '',
