@@ -15,7 +15,9 @@ class Settings(BaseSettings):
     vk_token: str = ""
     vk_api_version: str = "5.199"
     vk_chat_id: str = ""
-    # ID получателя в VK API (например, user_id менеджера для лички).
+    # Получатели заявок. Можно несколько через запятую:
+    #   VK_PEER_ID=146507806,225909038
+    # Для беседы — один peer_id вида 2000000197 (если сообщество реально видит чат).
     # Если задан — используется вместо VK_CHAT_ID.
     vk_target_peer_id: str = Field(
         default="",
@@ -37,20 +39,37 @@ class Settings(BaseSettings):
         return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
 
     @property
-    def vk_peer_id(self) -> int:
-        # Приоритет: явный peer_id (например, user_id для личных сообщений),
-        # иначе используем VK_CHAT_ID (id беседы без префикса 2000000000).
+    def vk_peer_ids(self) -> list[int]:
+        """Список peer_id для отправки заявки (ЛС и/или беседы)."""
         if self.vk_target_peer_id:
-            return int(self.vk_target_peer_id)
+            ids: list[int] = []
+            for part in self.vk_target_peer_id.replace(";", ",").split(","):
+                part = part.strip()
+                if not part:
+                    continue
+                ids.append(int(part))
+            if ids:
+                return ids
+
+        if not self.vk_chat_id:
+            return []
 
         chat_id = int(self.vk_chat_id)
         if chat_id >= 2_000_000_000:
-            return chat_id
-        return 2_000_000_000 + chat_id
+            return [chat_id]
+        return [2_000_000_000 + chat_id]
+
+    @property
+    def vk_peer_id(self) -> int:
+        """Первый получатель (для обратной совместимости)."""
+        ids = self.vk_peer_ids
+        if not ids:
+            raise ValueError("Не задан VK_PEER_ID или VK_CHAT_ID")
+        return ids[0]
 
     @property
     def vk_configured(self) -> bool:
-        return bool(self.vk_token and (self.vk_target_peer_id or self.vk_chat_id))
+        return bool(self.vk_token and self.vk_peer_ids)
 
 
 @lru_cache

@@ -160,14 +160,34 @@ class VKClient:
         return data["response"]
 
     def send_order_message(self, order: OrderData) -> None:
-        self._post(
-            "messages.send",
-            {
-                "peer_id": self.settings.vk_peer_id,
-                "random_id": random.randint(1, 2_000_000_000),
-                "message": build_order_message(order),
-            },
-        )
+        peer_ids = self.settings.vk_peer_ids
+        if not peer_ids:
+            raise RuntimeError("VK не настроен: задайте VK_PEER_ID или VK_CHAT_ID")
+
+        message = build_order_message(order)
+        errors: list[str] = []
+        sent = 0
+
+        for peer_id in peer_ids:
+            try:
+                self._post(
+                    "messages.send",
+                    {
+                        "peer_id": peer_id,
+                        "random_id": random.randint(1, 2_000_000_000),
+                        "message": message,
+                    },
+                )
+                sent += 1
+                logger.info("Order message sent to peer_id=%s", peer_id)
+            except Exception as error:
+                logger.exception("Failed to send order to peer_id=%s", peer_id)
+                errors.append(f"{peer_id}: {error}")
+
+        if sent == 0:
+            raise RuntimeError(
+                "VK send failed for all recipients: " + "; ".join(errors)
+            )
 
 
 class OrderService:
