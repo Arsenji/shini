@@ -65,71 +65,27 @@ def format_datetime(dt: datetime) -> str:
 def build_order_message(order: OrderData) -> str:
     lines = [
         "🚗 Новая заявка",
-        "",
-        "Имя:",
-        "",
-        order.name,
-        "",
+        f"Имя: {order.name}",
     ]
 
     if order.brand or order.model:
-        lines.extend(
-            [
-                "Товар:",
-                "",
-                f"{order.brand or ''} {order.model or ''}".strip(),
-                "",
-            ]
-        )
+        lines.append(f"Товар: {f'{order.brand or ''} {order.model or ''}'.strip()}")
 
     if order.category:
-        lines.extend(
-            [
-                "Тип:",
-                "",
-                CATEGORY_LABELS.get(order.category, order.category),
-                "",
-            ]
-        )
+        lines.append(f"Тип: {CATEGORY_LABELS.get(order.category, order.category)}")
 
     if order.season:
-        lines.extend(
-            [
-                "Сезон:",
-                "",
-                SEASON_LABELS.get(order.season, order.season),
-                "",
-            ]
-        )
+        lines.append(f"Сезон: {SEASON_LABELS.get(order.season, order.season)}")
 
-    lines.extend(
-        [
-            "Размер:",
-            "",
-            order.display_size,
-            "",
-        ]
-    )
+    lines.append(f"Размер: {order.display_size}")
 
     if order.sizes:
-        lines.extend(
-            [
-                "Доступные размеры:",
-                "",
-                order.sizes,
-                "",
-            ]
-        )
+        lines.append(f"Доступные размеры: {order.sizes}")
 
     lines.extend(
         [
-            "Телефон:",
-            "",
-            format_phone_display(order.phone),
-            "",
-            "Время:",
-            "",
-            format_datetime(order.created_at),
+            f"Телефон: {format_phone_display(order.phone)}",
+            f"Время: {format_datetime(order.created_at)}",
         ]
     )
 
