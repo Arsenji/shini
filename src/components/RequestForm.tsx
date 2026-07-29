@@ -124,11 +124,16 @@ export function RequestForm() {
                     {[categoryLabel, seasonLabel].filter(Boolean).join(' · ')}
                   </p>
                   <p className="request__interest-sizes">
-                    {interest.sizeGroup
-                      ? interest.sizeGroup
-                      : interest.sizes.length <= 4
-                        ? interest.sizes.join(' · ')
-                        : `${interest.sizes.slice(0, 4).join(' · ')} +${interest.sizes.length - 4}`}
+                    {interest.preferredSize
+                      ? interest.preferredSize
+                      : interest.sizeGroup
+                        ? interest.sizeGroup
+                        : interest.sizes.length <= 4
+                          ? interest.sizes.join(' · ')
+                          : `${interest.sizes.slice(0, 4).join(' · ')} +${interest.sizes.length - 4}`}
+                    {typeof interest.price === 'number' && interest.price > 0
+                      ? ` · ${interest.price.toLocaleString('ru-RU')} ₽`
+                      : ''}
                   </p>
                 </div>
                 <button type="button" className="request__interest-clear" onClick={clearInterest}>

@@ -79,9 +79,6 @@ export function Catalog() {
     return filtered.slice(start, start + PAGE_SIZE)
   }, [filtered, page])
 
-  const rangeStart = filtered.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
-  const rangeEnd = Math.min(page * PAGE_SIZE, filtered.length)
-
   function goToPage(next: number) {
     setPage(Math.min(totalPages, Math.max(1, next)))
     document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -242,10 +239,6 @@ export function Catalog() {
             </div>
 
             <div className="catalog__pagination">
-              <p className="catalog__pagination-info">
-                {rangeStart}–{rangeEnd} из {filtered.length}
-              </p>
-
               <div className="catalog__pagination-controls" role="navigation" aria-label="Страницы каталога">
                 <button
                   type="button"

@@ -1,5 +1,7 @@
+import { useMemo, useState } from 'react'
 import {
-  formatSizeList,
+  getOfferPrice,
+  getProductOffers,
   shopCategoryLabels,
   shopSeasonLabels,
   type ShopProduct,
@@ -11,19 +13,28 @@ type ShopCardProps = {
   product: ShopProduct
 }
 
+const PREVIEW_SIZES = 2
+
 function formatPrice(price: number): string {
   return `${price.toLocaleString('ru-RU')} ₽`
 }
 
 export function ShopCard({ product }: ShopCardProps) {
+  const offers = useMemo(() => getProductOffers(product), [product])
+  const [selectedSize, setSelectedSize] = useState(offers[0]?.size ?? product.sizes[0] ?? '')
+  const [sizesExpanded, setSizesExpanded] = useState(false)
+
   const categoryLabel = shopCategoryLabels[product.category]
   const seasonLabel = product.season ? shopSeasonLabels[product.season] : null
-  const sizeHeadline = product.sizeGroup ?? formatSizeList(product.sizes, 3)
-  const hasPrice = typeof product.price === 'number' && product.price > 0
+  const selectedPrice = selectedSize ? getOfferPrice(product, selectedSize) : null
+  const hasPrice = typeof selectedPrice === 'number' && selectedPrice > 0
   const hasImage = Boolean(product.image)
+  const hasMoreSizes = offers.length > PREVIEW_SIZES
+  const visibleOffers =
+    sizesExpanded || !hasMoreSizes ? offers : offers.slice(0, PREVIEW_SIZES)
 
   function handleOrderClick() {
-    setOrderInterest(productToOrderInterest(product))
+    setOrderInterest(productToOrderInterest(product, selectedSize))
   }
 
   return (
@@ -51,22 +62,36 @@ export function ShopCard({ product }: ShopCardProps) {
 
         <h3 className="shop-card__brand">{product.brand}</h3>
         <p className="shop-card__model">{product.model}</p>
-        <p className="shop-card__size">{sizeHeadline}</p>
 
-        {product.sizes.length > 1 && (
-          <details className="shop-card__sizes">
-            <summary>Все размеры ({product.sizes.length})</summary>
-            <ul>
-              {product.sizes.map((size) => (
-                <li key={size}>{size}</li>
-              ))}
-            </ul>
-          </details>
+        {offers.length > 0 && (
+          <div className="shop-card__size-picker" role="group" aria-label="Размеры">
+            {visibleOffers.map((offer) => (
+              <button
+                key={offer.size}
+                type="button"
+                className={`shop-card__size-chip${selectedSize === offer.size ? ' shop-card__size-chip--active' : ''}`}
+                onClick={() => setSelectedSize(offer.size)}
+                aria-pressed={selectedSize === offer.size}
+              >
+                {offer.size}
+              </button>
+            ))}
+            {hasMoreSizes && (
+              <button
+                type="button"
+                className="shop-card__size-chip shop-card__size-chip--more"
+                onClick={() => setSizesExpanded((open) => !open)}
+                aria-expanded={sizesExpanded}
+              >
+                {sizesExpanded ? 'Свернуть' : `Все размеры (${offers.length})`}
+              </button>
+            )}
+          </div>
         )}
 
         <div className="shop-card__footer">
           <span className={hasPrice ? 'shop-card__price' : 'shop-card__price-note'}>
-            {hasPrice ? formatPrice(product.price!) : 'Цена по запросу'}
+            {hasPrice ? formatPrice(selectedPrice!) : 'Цена по запросу'}
           </span>
           <a href="#request" className="shop-card__btn" onClick={handleOrderClick}>
             Заказать

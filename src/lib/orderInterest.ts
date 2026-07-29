@@ -1,4 +1,4 @@
-import type { ShopProduct } from '../data/shop'
+import { getOfferPrice, getProductOffers, type ShopProduct } from '../data/shop'
 
 export const ORDER_INTEREST_EVENT = 'kolesa:order-interest'
 const STORAGE_KEY = 'kolesa_order_interest'
@@ -11,12 +11,25 @@ export type OrderInterest = {
   season?: string
   sizeGroup?: string
   sizes: string[]
-  /** Размер для поля формы (группа или первый размер) */
+  /** Размер для поля формы (выбранный на карточке) */
   preferredSize: string
+  /** Цена выбранного размера, если есть */
+  price?: number | null
 }
 
-export function productToOrderInterest(product: ShopProduct): OrderInterest {
-  const preferredSize = product.sizeGroup ?? product.sizes[0] ?? ''
+export function productToOrderInterest(
+  product: ShopProduct,
+  selectedSize?: string,
+): OrderInterest {
+  const offers = getProductOffers(product)
+  const preferredSize =
+    selectedSize ||
+    product.sizeGroup ||
+    offers[0]?.size ||
+    product.sizes[0] ||
+    ''
+  const price = preferredSize ? getOfferPrice(product, preferredSize) : product.price ?? null
+
   return {
     productId: product.id,
     brand: product.brand,
@@ -24,8 +37,9 @@ export function productToOrderInterest(product: ShopProduct): OrderInterest {
     category: product.category,
     season: product.season,
     sizeGroup: product.sizeGroup,
-    sizes: product.sizes,
+    sizes: offers.map((o) => o.size),
     preferredSize,
+    price,
   }
 }
 
