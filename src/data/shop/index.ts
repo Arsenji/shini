@@ -106,7 +106,51 @@ export function getUniqueSizeGroups(products: ShopProduct[]): string[] {
   for (const product of products) {
     if (product.sizeGroup) groups.add(product.sizeGroup)
   }
-  return Array.from(groups).sort()
+  return Array.from(groups).sort(compareTireSizes)
+}
+
+/**
+ * Чипы размерной сетки: sizeGroup (если есть) или все sizes товара.
+ * Уже отфильтрованный список (категория + сезон) передавайте снаружи.
+ */
+export function getCatalogSizeChips(products: ShopProduct[]): string[] {
+  const chips = new Set<string>()
+  for (const product of products) {
+    if (product.sizeGroup) {
+      chips.add(product.sizeGroup)
+      continue
+    }
+    for (const size of product.sizes) {
+      chips.add(size)
+    }
+  }
+  return Array.from(chips).sort(compareTireSizes)
+}
+
+export function productMatchesSizeChip(product: ShopProduct, chip: string): boolean {
+  if (!chip) return true
+  if (product.sizeGroup === chip) return true
+  return product.sizes.includes(chip)
+}
+
+function compareTireSizes(a: string, b: string): number {
+  const parse = (value: string) => {
+    const metric = value.match(/^(\d+)\/(\d+)R([\d.]+)(C)?$/i)
+    if (metric) {
+      return [0, Number(metric[1]), Number(metric[2]), Number(metric[3]), metric[4] ? 1 : 0] as const
+    }
+    const alt = value.match(/^([\d.]+)[Rr-]([\d.]+)$/)
+    if (alt) {
+      return [1, Number(alt[1]), Number(alt[2]), 0, 0] as const
+    }
+    return [2, 0, 0, 0, 0] as const
+  }
+  const left = parse(a)
+  const right = parse(b)
+  for (let i = 0; i < left.length; i += 1) {
+    if (left[i] !== right[i]) return left[i] - right[i]
+  }
+  return a.localeCompare(b, 'ru')
 }
 
 export function formatSizeList(sizes: string[], limit = 4): string {

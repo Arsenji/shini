@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import {
   filterShopProducts,
+  getCatalogSizeChips,
   getShopStats,
   getSizeFilterOptions,
-  getUniqueSizeGroups,
+  productMatchesSizeChip,
   shopCategoryLabels,
   shopProducts,
   type ShopCategoryFilter,
@@ -14,6 +15,9 @@ import { ShopCard } from './shop/ShopCard'
 
 const categoryFilters: ShopCategoryFilter[] = ['all', 'passenger', 'lcv', 'truck']
 const PAGE_SIZE = 12
+/** Сколько номеров страниц показывать; окна: 1–10 ↔ 10–19 ↔ 19–28… */
+const PAGE_WINDOW = 10
+const SIZE_GROUP_PREVIEW = 6
 
 const emptySizeFilters: ShopSizeFilters = {
   width: '',
@@ -26,10 +30,11 @@ export function Catalog() {
   const [season, setSeason] = useState<ShopSeason>('summer')
   const [sizeFilters, setSizeFilters] = useState<ShopSizeFilters>(emptySizeFilters)
   const [sizeGroup, setSizeGroup] = useState('')
+  const [sizeGroupsExpanded, setSizeGroupsExpanded] = useState(false)
   const [page, setPage] = useState(1)
+  const [pageWindowStart, setPageWindowStart] = useState(1)
 
   const stats = useMemo(() => getShopStats(shopProducts), [])
-  const sizeGroups = useMemo(() => getUniqueSizeGroups(shopProducts), [])
 
   const categoryProducts = useMemo(
     () => filterShopProducts(shopProducts, category, season, emptySizeFilters),
@@ -44,18 +49,52 @@ export function Catalog() {
   const filtered = useMemo(() => {
     const byFilters = filterShopProducts(shopProducts, category, season, sizeFilters)
     if (!sizeGroup) return byFilters
-    return byFilters.filter((p) => p.sizeGroup === sizeGroup)
+    return byFilters.filter((p) => productMatchesSizeChip(p, sizeGroup))
   }, [category, season, sizeFilters, sizeGroup])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
 
+  const visibleSizeGroups = useMemo(
+    () => getCatalogSizeChips(categoryProducts),
+    [categoryProducts],
+  )
+
+  const hasMoreSizeGroups = visibleSizeGroups.length > SIZE_GROUP_PREVIEW
+  const previewSizeGroups = useMemo(() => {
+    if (sizeGroupsExpanded || !hasMoreSizeGroups) return visibleSizeGroups
+    const preview = visibleSizeGroups.slice(0, SIZE_GROUP_PREVIEW)
+    if (sizeGroup && !preview.includes(sizeGroup)) {
+      return [...preview.slice(0, Math.max(0, SIZE_GROUP_PREVIEW - 1)), sizeGroup]
+    }
+    return preview
+  }, [visibleSizeGroups, sizeGroupsExpanded, hasMoreSizeGroups, sizeGroup])
+
   useEffect(() => {
     setPage(1)
+    setPageWindowStart(1)
   }, [category, season, sizeFilters, sizeGroup])
+
+  useEffect(() => {
+    setSizeGroupsExpanded(false)
+  }, [category, season])
+
+  useEffect(() => {
+    if (sizeGroup && !visibleSizeGroups.includes(sizeGroup)) {
+      setSizeGroup('')
+    }
+  }, [visibleSizeGroups, sizeGroup])
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages)
   }, [page, totalPages])
+
+  useEffect(() => {
+    if (totalPages <= PAGE_WINDOW) {
+      setPageWindowStart(1)
+      return
+    }
+    setPageWindowStart((start) => Math.min(start, Math.max(1, totalPages - PAGE_WINDOW + 1)))
+  }, [totalPages])
 
   useEffect(() => {
     setSizeFilters((prev) => {
@@ -79,8 +118,38 @@ export function Catalog() {
     return filtered.slice(start, start + PAGE_SIZE)
   }, [filtered, page])
 
+  const visiblePages = useMemo(() => {
+    if (totalPages <= PAGE_WINDOW) {
+      return Array.from({ length: totalPages }, (_, index) => index + 1)
+    }
+
+    const windowEnd = Math.min(totalPages, pageWindowStart + PAGE_WINDOW - 1)
+    return Array.from({ length: windowEnd - pageWindowStart + 1 }, (_, index) => pageWindowStart + index)
+  }, [pageWindowStart, totalPages])
+
   function goToPage(next: number) {
-    setPage(Math.min(totalPages, Math.max(1, next)))
+    const target = Math.min(totalPages, Math.max(1, next))
+    const step = PAGE_WINDOW - 1
+
+    if (totalPages > PAGE_WINDOW) {
+      const windowEnd = Math.min(totalPages, pageWindowStart + PAGE_WINDOW - 1)
+      const isFirstInWindow = target === pageWindowStart
+      const isLastInWindow = target === windowEnd
+
+      if (isFirstInWindow && pageWindowStart > 1) {
+        // 10–19 → клик 10 → окно 1–10
+        setPageWindowStart(Math.max(1, pageWindowStart - step))
+      } else if (isLastInWindow && target < totalPages) {
+        // 1–10 → клик 10 → окно 10–19
+        setPageWindowStart(target)
+      } else if (target < pageWindowStart) {
+        setPageWindowStart(Math.max(1, pageWindowStart - step))
+      } else if (target > windowEnd) {
+        setPageWindowStart(Math.min(pageWindowStart + step, Math.max(1, totalPages - PAGE_WINDOW + 1)))
+      }
+    }
+
+    setPage(target)
     document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -197,9 +266,9 @@ export function Catalog() {
             </label>
           </div>
 
-          {(category === 'lcv' || category === 'truck' || category === 'all') && (
+          {visibleSizeGroups.length > 0 && (
             <div className="catalog__size-groups-block">
-              <span className="catalog__field-label">Размерная группа</span>
+              <span className="catalog__field-label">Размеры</span>
               <div className="catalog__size-groups">
                 <button
                   type="button"
@@ -208,21 +277,28 @@ export function Catalog() {
                 >
                   Все размеры
                 </button>
-                {sizeGroups
-                  .filter((group) => {
-                    if (category === 'all') return true
-                    return shopProducts.some((p) => p.sizeGroup === group && p.category === category)
-                  })
-                  .map((group) => (
-                    <button
-                      key={group}
-                      type="button"
-                      className={`catalog__chip ${sizeGroup === group ? 'catalog__chip--active' : ''}`}
-                      onClick={() => setSizeGroup(group)}
-                    >
-                      {group}
-                    </button>
-                  ))}
+                {previewSizeGroups.map((group) => (
+                  <button
+                    key={group}
+                    type="button"
+                    className={`catalog__chip catalog__chip--group ${sizeGroup === group ? 'catalog__chip--active' : ''}`}
+                    onClick={() => setSizeGroup(group)}
+                  >
+                    {group}
+                  </button>
+                ))}
+                {hasMoreSizeGroups && (
+                  <button
+                    type="button"
+                    className="catalog__chip catalog__chip--more"
+                    onClick={() => setSizeGroupsExpanded((open) => !open)}
+                    aria-expanded={sizeGroupsExpanded}
+                  >
+                    {sizeGroupsExpanded
+                      ? 'Свернуть'
+                      : `Все размеры (${visibleSizeGroups.length})`}
+                  </button>
+                )}
               </div>
             </div>
           )}
@@ -250,7 +326,7 @@ export function Catalog() {
                   ←
                 </button>
 
-                {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                {visiblePages.map((pageNumber) => (
                   <button
                     key={pageNumber}
                     type="button"
