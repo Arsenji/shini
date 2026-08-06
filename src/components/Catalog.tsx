@@ -57,6 +57,8 @@ export function Catalog() {
 
   const stats = useMemo(() => getShopStats(shopProducts), [])
   const showDiskFilters = category === 'disk'
+  const showAccessoryFilters = category === 'tube' || category === 'rimTape'
+  const showWidthDiameterFilters = showDiskFilters || showAccessoryFilters
   const showGroupedSizes = category === 'all'
 
   const categoryProducts = useMemo(
@@ -294,11 +296,17 @@ export function Catalog() {
           </div>
 
           <div
-            className={`catalog__dims${showDiskFilters ? ' catalog__dims--disk' : ''}`}
+            className={`catalog__dims${
+              showDiskFilters
+                ? ' catalog__dims--disk'
+                : showAccessoryFilters
+                  ? ' catalog__dims--accessory'
+                  : ''
+            }`}
           >
             <label className="catalog__dim">
               <span className="catalog__field-label">
-                {showDiskFilters ? 'Ширина' : 'Ширина, мм'}
+                {showWidthDiameterFilters ? 'Ширина' : 'Ширина, мм'}
               </span>
               <select
                 className="catalog__select"
@@ -314,7 +322,7 @@ export function Catalog() {
               </select>
             </label>
 
-            {!showDiskFilters && (
+            {!showWidthDiameterFilters && (
               <label className="catalog__dim">
                 <span className="catalog__field-label">Профиль</span>
                 <select

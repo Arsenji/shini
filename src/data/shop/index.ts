@@ -17,6 +17,12 @@ export type ParsedDiskSize = {
   diameters: string[]
 }
 
+/** Разбор размера камеры / ободной ленты: 11.00-20, 6.95R16, УК15 */
+export type ParsedAccessorySize = {
+  widths: string[]
+  diameters: string[]
+}
+
 export type ShopSizeFilters = {
   width: string
   profile: string
@@ -71,6 +77,60 @@ export function parseDiskSize(value: string): ParsedDiskSize {
   }
 }
 
+/** Из «11.00-20», «6.95R16», «УК15», «15.5/65-18» → ширина + R-диаметр */
+export function parseAccessorySize(value: string): ParsedAccessorySize {
+  const text = value.trim().replace(/,/g, '.')
+  const widths = new Set<string>()
+  const diameters = new Set<string>()
+
+  const uk = text.match(/^УК\s*(\d{2})$/i)
+  if (uk) {
+    diameters.add(`R${uk[1]}`)
+    return { widths: [], diameters: Array.from(diameters) }
+  }
+
+  const rOnly = text.match(/^R\s*(\d{2}(?:\.\d)?)$/i)
+  if (rOnly) {
+    diameters.add(`R${formatDiskNumber(rOnly[1])}`)
+    return { widths: [], diameters: Array.from(diameters) }
+  }
+
+  const slash = text.match(/^(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/i)
+  if (slash) {
+    widths.add(formatDiskNumber(slash[1]))
+    diameters.add(`R${formatDiskNumber(slash[3])}`)
+    return { widths: Array.from(widths), diameters: Array.from(diameters) }
+  }
+
+  const wr = text.match(/^(\d+(?:\.\d+)?)\s*R\s*(\d{2}(?:\.\d)?)$/i)
+  if (wr) {
+    widths.add(formatDiskNumber(wr[1]))
+    diameters.add(`R${formatDiskNumber(wr[2])}`)
+    return { widths: Array.from(widths), diameters: Array.from(diameters) }
+  }
+
+  const dash = text.match(/^(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)$/)
+  if (dash) {
+    widths.add(formatDiskNumber(dash[1]))
+    const diameter = Number(dash[2])
+    if (diameter <= 50) {
+      diameters.add(`R${formatDiskNumber(dash[2])}`)
+    } else {
+      diameters.add(formatDiskNumber(dash[2]))
+    }
+    return { widths: Array.from(widths), diameters: Array.from(diameters) }
+  }
+
+  const triple = text.match(/^(\d+)-(\d+)-(\d+)$/)
+  if (triple) {
+    widths.add(formatDiskNumber(triple[1]))
+    diameters.add(formatDiskNumber(triple[3]))
+    return { widths: Array.from(widths), diameters: Array.from(diameters) }
+  }
+
+  return { widths: [], diameters: [] }
+}
+
 export function getProductSizeParts(product: ShopProduct): ParsedTireSize[] {
   return product.sizes
     .map(parseTireSize)
@@ -81,6 +141,14 @@ export function getProductDiskSizeParts(product: ShopProduct): ParsedDiskSize[] 
   return product.sizes.map(parseDiskSize)
 }
 
+export function getProductAccessorySizeParts(product: ShopProduct): ParsedAccessorySize[] {
+  return product.sizes.map(parseAccessorySize)
+}
+
+function isAccessoryCategory(category: ShopCategory): boolean {
+  return category === 'tube' || category === 'rimTape'
+}
+
 function matchesSeason(product: ShopProduct, season: ShopSeason | 'all'): boolean {
   if (season === 'all') return true
   // Диски / камеры / ленты / грузовые без сезона — показываем при любом сезоне
@@ -89,11 +157,14 @@ function matchesSeason(product: ShopProduct, season: ShopSeason | 'all'): boolea
   return product.season === season
 }
 
-function matchesDiskSizeFilters(product: ShopProduct, sizeFilters: ShopSizeFilters): boolean {
+function matchesWidthDiameterFilters(
+  parts: { widths: string[]; diameters: string[] }[],
+  sizeFilters: ShopSizeFilters,
+): boolean {
   const { width, diameter } = sizeFilters
   if (!width && !diameter) return true
 
-  return getProductDiskSizeParts(product).some((part) => {
+  return parts.some((part) => {
     if (width && !part.widths.includes(width)) return false
     if (diameter && !part.diameters.includes(diameter)) return false
     return true
@@ -105,7 +176,11 @@ function matchesSizeFilters(product: ShopProduct, sizeFilters: ShopSizeFilters):
   if (!width && !profile && !diameter) return true
 
   if (product.category === 'disk') {
-    return matchesDiskSizeFilters(product, sizeFilters)
+    return matchesWidthDiameterFilters(getProductDiskSizeParts(product), sizeFilters)
+  }
+
+  if (isAccessoryCategory(product.category)) {
+    return matchesWidthDiameterFilters(getProductAccessorySizeParts(product), sizeFilters)
   }
 
   return getProductSizeParts(product).some((part) => {
@@ -142,24 +217,22 @@ export function getDiskColors(products: ShopProduct[]): string[] {
   return Array.from(colors).sort((a, b) => a.localeCompare(b, 'ru'))
 }
 
-function getDiskFilterOptions(
-  products: ShopProduct[],
+function getWidthDiameterFilterOptions(
+  partsList: { widths: string[]; diameters: string[] }[],
   sizeFilters: ShopSizeFilters,
 ): { widths: string[]; profiles: string[]; diameters: string[] } {
   const widths = new Set<string>()
   const diameters = new Set<string>()
 
-  for (const product of products) {
-    for (const part of getProductDiskSizeParts(product)) {
-      const widthOk = !sizeFilters.width || part.widths.includes(sizeFilters.width)
-      const diameterOk = !sizeFilters.diameter || part.diameters.includes(sizeFilters.diameter)
+  for (const part of partsList) {
+    const widthOk = !sizeFilters.width || part.widths.includes(sizeFilters.width)
+    const diameterOk = !sizeFilters.diameter || part.diameters.includes(sizeFilters.diameter)
 
-      if (diameterOk) {
-        for (const width of part.widths) widths.add(width)
-      }
-      if (widthOk) {
-        for (const diameter of part.diameters) diameters.add(diameter)
-      }
+    if (diameterOk) {
+      for (const width of part.widths) widths.add(width)
+    }
+    if (widthOk) {
+      for (const diameter of part.diameters) diameters.add(diameter)
     }
   }
 
@@ -179,7 +252,19 @@ export function getSizeFilterOptions(
 ): { widths: string[]; profiles: string[]; diameters: string[] } {
   const onlyDisks = products.length > 0 && products.every((product) => product.category === 'disk')
   if (onlyDisks) {
-    return getDiskFilterOptions(products, sizeFilters)
+    return getWidthDiameterFilterOptions(
+      products.flatMap((product) => getProductDiskSizeParts(product)),
+      sizeFilters,
+    )
+  }
+
+  const onlyAccessories =
+    products.length > 0 && products.every((product) => isAccessoryCategory(product.category))
+  if (onlyAccessories) {
+    return getWidthDiameterFilterOptions(
+      products.flatMap((product) => getProductAccessorySizeParts(product)),
+      sizeFilters,
+    )
   }
 
   const widths = new Set<string>()

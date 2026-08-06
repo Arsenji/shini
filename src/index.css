@@ -834,6 +834,10 @@ select.input {
   grid-template-columns: repeat(3, 1fr);
 }
 
+.catalog__dims--accessory {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .catalog__dim {
   display: flex;
   flex-direction: column;
