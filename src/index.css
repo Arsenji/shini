@@ -829,8 +829,9 @@ select.input {
   gap: 14px;
 }
 
-.catalog__dims--with-color {
-  grid-template-columns: repeat(4, 1fr);
+.catalog__dims--with-color,
+.catalog__dims--disk {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .catalog__dim {

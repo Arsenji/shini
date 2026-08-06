@@ -56,7 +56,7 @@ export function Catalog() {
   const [pageWindowStart, setPageWindowStart] = useState(1)
 
   const stats = useMemo(() => getShopStats(shopProducts), [])
-  const showDiskColor = category === 'disk'
+  const showDiskFilters = category === 'disk'
   const showGroupedSizes = category === 'all'
 
   const categoryProducts = useMemo(
@@ -77,11 +77,11 @@ export function Catalog() {
       category,
       season,
       sizeFilters,
-      showDiskColor ? diskColor : '',
+      showDiskFilters ? diskColor : '',
     )
     if (!sizeGroup) return byFilters
     return byFilters.filter((p) => productMatchesSizeChip(p, sizeGroup))
-  }, [category, season, sizeFilters, sizeGroup, diskColor, showDiskColor])
+  }, [category, season, sizeFilters, sizeGroup, diskColor, showDiskFilters])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
 
@@ -117,6 +117,7 @@ export function Catalog() {
     setSizeGroupsExpanded(false)
     setExpandedSizeCategories({})
     setDiskColor('')
+    setSizeFilters(emptySizeFilters)
   }, [category, season])
 
   useEffect(() => {
@@ -272,9 +273,13 @@ export function Catalog() {
             </div>
           </div>
 
-          <div className={`catalog__dims${showDiskColor ? ' catalog__dims--with-color' : ''}`}>
+          <div
+            className={`catalog__dims${showDiskFilters ? ' catalog__dims--disk' : ''}`}
+          >
             <label className="catalog__dim">
-              <span className="catalog__field-label">Ширина, мм</span>
+              <span className="catalog__field-label">
+                {showDiskFilters ? 'Ширина' : 'Ширина, мм'}
+              </span>
               <select
                 className="catalog__select"
                 value={sizeFilters.width}
@@ -289,21 +294,23 @@ export function Catalog() {
               </select>
             </label>
 
-            <label className="catalog__dim">
-              <span className="catalog__field-label">Профиль</span>
-              <select
-                className="catalog__select"
-                value={sizeFilters.profile}
-                onChange={(e) => updateSizeFilter('profile', e.target.value)}
-              >
-                <option value="">Все</option>
-                {sizeOptions.profiles.map((profile) => (
-                  <option key={profile} value={profile}>
-                    {profile}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {!showDiskFilters && (
+              <label className="catalog__dim">
+                <span className="catalog__field-label">Профиль</span>
+                <select
+                  className="catalog__select"
+                  value={sizeFilters.profile}
+                  onChange={(e) => updateSizeFilter('profile', e.target.value)}
+                >
+                  <option value="">Все</option>
+                  {sizeOptions.profiles.map((profile) => (
+                    <option key={profile} value={profile}>
+                      {profile}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
 
             <label className="catalog__dim">
               <span className="catalog__field-label">Диаметр</span>
@@ -321,7 +328,7 @@ export function Catalog() {
               </select>
             </label>
 
-            {showDiskColor && (
+            {showDiskFilters && (
               <label className="catalog__dim">
                 <span className="catalog__field-label">Цвет</span>
                 <select

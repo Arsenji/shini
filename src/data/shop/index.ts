@@ -11,6 +11,12 @@ export type ParsedTireSize = {
   diameter: string
 }
 
+/** Разбор размера диска: ширина из 5x14 / 4x114, диаметр из R15 или 5x15 → R15 */
+export type ParsedDiskSize = {
+  widths: string[]
+  diameters: string[]
+}
+
 export type ShopSizeFilters = {
   width: string
   profile: string
@@ -33,10 +39,46 @@ export function parseTireSize(value: string): ParsedTireSize | null {
   }
 }
 
+function formatDiskNumber(value: string): string {
+  const normalized = value.replace(',', '.')
+  const num = Number(normalized)
+  if (!Number.isFinite(num)) return normalized
+  return String(num)
+}
+
+/** Из «5x14 4x100 ET45» → widths [5, 4], diameters [R14] */
+export function parseDiskSize(value: string): ParsedDiskSize {
+  const text = value.replace(/,/g, '.').replace(/[х×*]/gi, 'x')
+  const widths = new Set<string>()
+  const diameters = new Set<string>()
+
+  for (const match of text.matchAll(/(\d+(?:\.\d+)?)\s*x\s*(\d+(?:\.\d+)?)/gi)) {
+    widths.add(formatDiskNumber(match[1]))
+    const second = Number(match[2].replace(',', '.'))
+    // Диаметр обода: 5x14 → R14 (не путать с PCD 4x100 / 5x114.3)
+    if (second >= 12 && second <= 25) {
+      diameters.add(`R${formatDiskNumber(match[2])}`)
+    }
+  }
+
+  for (const match of text.matchAll(/\bR\s*(\d{2}(?:\.\d)?)\b/gi)) {
+    diameters.add(`R${formatDiskNumber(match[1])}`)
+  }
+
+  return {
+    widths: Array.from(widths),
+    diameters: Array.from(diameters),
+  }
+}
+
 export function getProductSizeParts(product: ShopProduct): ParsedTireSize[] {
   return product.sizes
     .map(parseTireSize)
     .filter((part): part is ParsedTireSize => part !== null)
+}
+
+export function getProductDiskSizeParts(product: ShopProduct): ParsedDiskSize[] {
+  return product.sizes.map(parseDiskSize)
 }
 
 function matchesSeason(product: ShopProduct, season: ShopSeason | 'all'): boolean {
@@ -47,9 +89,24 @@ function matchesSeason(product: ShopProduct, season: ShopSeason | 'all'): boolea
   return product.season === season
 }
 
+function matchesDiskSizeFilters(product: ShopProduct, sizeFilters: ShopSizeFilters): boolean {
+  const { width, diameter } = sizeFilters
+  if (!width && !diameter) return true
+
+  return getProductDiskSizeParts(product).some((part) => {
+    if (width && !part.widths.includes(width)) return false
+    if (diameter && !part.diameters.includes(diameter)) return false
+    return true
+  })
+}
+
 function matchesSizeFilters(product: ShopProduct, sizeFilters: ShopSizeFilters): boolean {
   const { width, profile, diameter } = sizeFilters
   if (!width && !profile && !diameter) return true
+
+  if (product.category === 'disk') {
+    return matchesDiskSizeFilters(product, sizeFilters)
+  }
 
   return getProductSizeParts(product).some((part) => {
     if (width && part.width !== width) return false
@@ -85,11 +142,46 @@ export function getDiskColors(products: ShopProduct[]): string[] {
   return Array.from(colors).sort((a, b) => a.localeCompare(b, 'ru'))
 }
 
+function getDiskFilterOptions(
+  products: ShopProduct[],
+  sizeFilters: ShopSizeFilters,
+): { widths: string[]; profiles: string[]; diameters: string[] } {
+  const widths = new Set<string>()
+  const diameters = new Set<string>()
+
+  for (const product of products) {
+    for (const part of getProductDiskSizeParts(product)) {
+      const widthOk = !sizeFilters.width || part.widths.includes(sizeFilters.width)
+      const diameterOk = !sizeFilters.diameter || part.diameters.includes(sizeFilters.diameter)
+
+      if (diameterOk) {
+        for (const width of part.widths) widths.add(width)
+      }
+      if (widthOk) {
+        for (const diameter of part.diameters) diameters.add(diameter)
+      }
+    }
+  }
+
+  const byNumber = (a: string, b: string) => parseFloat(a.replace(/^R/i, '')) - parseFloat(b.replace(/^R/i, ''))
+
+  return {
+    widths: Array.from(widths).sort(byNumber),
+    profiles: [],
+    diameters: Array.from(diameters).sort(byNumber),
+  }
+}
+
 /** Уникальные значения ширины/профиля/диаметра с учётом уже выбранных фильтров */
 export function getSizeFilterOptions(
   products: ShopProduct[],
   sizeFilters: ShopSizeFilters,
 ): { widths: string[]; profiles: string[]; diameters: string[] } {
+  const onlyDisks = products.length > 0 && products.every((product) => product.category === 'disk')
+  if (onlyDisks) {
+    return getDiskFilterOptions(products, sizeFilters)
+  }
+
   const widths = new Set<string>()
   const profiles = new Set<string>()
   const diameters = new Set<string>()
