@@ -443,7 +443,7 @@ select.input {
 .hero__title-line--typed {
   color: var(--gold);
   min-height: 1.2em;
-  min-width: 12ch;
+  min-width: 14ch;
 }
 
 .hero__title strong {
@@ -899,6 +899,10 @@ select.input {
 
 .catalog__size-groups--all {
   margin-bottom: 12px;
+}
+
+.catalog__size-groups--toggle {
+  margin-top: 12px;
 }
 
 .catalog__size-sections {

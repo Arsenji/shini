@@ -7,7 +7,7 @@ import { TireTracks } from './TireTracks'
 type FormStatus = 'idle' | 'loading' | 'success' | 'error'
 
 export function Hero() {
-  const typed = useTypewriter()
+  const { lead, text: typed, showPrices } = useTypewriter()
   const [name, setName] = useState('')
   const [width, setWidth] = useState('')
   const [profile, setProfile] = useState('')
@@ -72,14 +72,16 @@ export function Hero() {
           <div className="hero__content">
           <p className="hero__tag">Шины, диски, шиномонтаж</p>
           <h1 className="hero__title">
-            <span className="hero__title-line">Качественные</span>
+            <span className="hero__title-line">{lead}</span>
             <span className="hero__title-line hero__title-line--typed">
               {typed}
               <span className="hero__cursor">|</span>
             </span>
-            <span className="hero__title-line">
-              по <strong>выгодным ценам</strong>
-            </span>
+            {showPrices && (
+              <span className="hero__title-line">
+                по <strong>выгодным ценам</strong>
+              </span>
+            )}
           </h1>
           <p className="hero__desc">
             <span className="hero__desc-highlight">

@@ -1,14 +1,28 @@
 import { useEffect, useState } from 'react'
 
-const phrases = ['шины', 'диски', 'шиномонтаж', 'выгодно']
+export type HeroPhrase = {
+  lead: string
+  word: string
+  /** Показывать строку «по выгодным ценам» */
+  showPrices: boolean
+}
+
+const phrases: HeroPhrase[] = [
+  { lead: 'Качественные', word: 'шины', showPrices: true },
+  { lead: 'Качественные', word: 'диски', showPrices: true },
+  { lead: 'Качественный', word: 'шиномонтаж', showPrices: true },
+  { lead: 'Качественно', word: 'и выгодно', showPrices: false },
+]
 
 export function useTypewriter() {
   const [text, setText] = useState('')
   const [phraseIndex, setPhraseIndex] = useState(0)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  const phrase = phrases[phraseIndex]
+
   useEffect(() => {
-    const current = phrases[phraseIndex]
+    const current = phrase.word
     const timeout = setTimeout(
       () => {
         if (!isDeleting) {
@@ -29,7 +43,11 @@ export function useTypewriter() {
       isDeleting ? 60 : 120,
     )
     return () => clearTimeout(timeout)
-  }, [text, phraseIndex, isDeleting])
+  }, [text, phraseIndex, isDeleting, phrase.word])
 
-  return text
+  return {
+    lead: phrase.lead,
+    text,
+    showPrices: phrase.showPrices,
+  }
 }

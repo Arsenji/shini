@@ -51,7 +51,6 @@ export function Catalog() {
   const [sizeGroup, setSizeGroup] = useState('')
   const [diskColor, setDiskColor] = useState('')
   const [sizeGroupsExpanded, setSizeGroupsExpanded] = useState(false)
-  const [expandedSizeCategories, setExpandedSizeCategories] = useState<Record<string, boolean>>({})
   const [page, setPage] = useState(1)
   const [pageWindowStart, setPageWindowStart] = useState(1)
 
@@ -95,6 +94,15 @@ export function Catalog() {
     [categoryProducts],
   )
 
+  const passengerSizeGroup = useMemo(
+    () => sizeGroupsByCategory.find((group) => group.category === 'passenger') ?? null,
+    [sizeGroupsByCategory],
+  )
+
+  const hasOtherSizeCategories = sizeGroupsByCategory.some(
+    (group) => group.category !== 'passenger' && group.chips.length > 0,
+  )
+
   const hasMoreSizeGroups = visibleSizeGroups.length > SIZE_GROUP_PREVIEW
   const previewSizeGroups = useMemo(
     () => previewChips(visibleSizeGroups, sizeGroupsExpanded, sizeGroup),
@@ -108,6 +116,19 @@ export function Catalog() {
     return visibleSizeGroups
   }, [showGroupedSizes, sizeGroupsByCategory, visibleSizeGroups])
 
+  const passengerSizeChips = passengerSizeGroup?.chips ?? []
+  const collapsedPassengerChips = useMemo(
+    () => previewChips(passengerSizeChips, false, sizeGroup),
+    [passengerSizeChips, sizeGroup],
+  )
+  const selectedOutsidePassenger =
+    Boolean(sizeGroup) &&
+    showGroupedSizes &&
+    !passengerSizeChips.includes(sizeGroup)
+  const groupedSizesExpanded = sizeGroupsExpanded || selectedOutsidePassenger
+  const canExpandGroupedSizes =
+    hasOtherSizeCategories || passengerSizeChips.length > SIZE_GROUP_PREVIEW
+
   useEffect(() => {
     setPage(1)
     setPageWindowStart(1)
@@ -115,7 +136,6 @@ export function Catalog() {
 
   useEffect(() => {
     setSizeGroupsExpanded(false)
-    setExpandedSizeCategories({})
     setDiskColor('')
     setSizeFilters(emptySizeFilters)
   }, [category, season])
@@ -203,16 +223,11 @@ export function Catalog() {
     setSizeFilters((prev) => ({ ...prev, [key]: value }))
   }
 
-  function toggleCategorySizes(categoryKey: string) {
-    setExpandedSizeCategories((prev) => ({
-      ...prev,
-      [categoryKey]: !prev[categoryKey],
-    }))
-  }
-
   const hasAnySizeChips = showGroupedSizes
     ? sizeGroupsByCategory.some((group) => group.chips.length > 0)
     : visibleSizeGroups.length > 0
+
+  const totalGroupedSizeCount = allSizeChips.length
 
   return (
     <section id="catalog" className="section catalog">
@@ -352,55 +367,95 @@ export function Catalog() {
             <div className="catalog__size-groups-block">
               <span className="catalog__field-label">Размеры</span>
 
-              <div className="catalog__size-groups catalog__size-groups--all">
-                <button
-                  type="button"
-                  className={`catalog__chip ${sizeGroup === '' ? 'catalog__chip--active' : ''}`}
-                  onClick={() => setSizeGroup('')}
-                >
-                  Все размеры
-                </button>
-              </div>
-
               {showGroupedSizes ? (
-                <div className="catalog__size-sections">
-                  {sizeGroupsByCategory.map((group) => {
-                    const expanded = Boolean(expandedSizeCategories[group.category])
-                    const hasMore = group.chips.length > SIZE_GROUP_PREVIEW
-                    const chips = previewChips(group.chips, expanded, sizeGroup)
-                    return (
-                      <div key={group.category} className="catalog__size-section">
-                        <p className="catalog__size-section-title">{group.label}</p>
-                        <div className="catalog__size-groups">
-                          {chips.map((chip) => (
-                            <button
-                              key={`${group.category}-${chip}`}
-                              type="button"
-                              className={`catalog__chip catalog__chip--group ${sizeGroup === chip ? 'catalog__chip--active' : ''}`}
-                              onClick={() => setSizeGroup(chip)}
-                            >
-                              {chip}
-                            </button>
-                          ))}
-                          {hasMore && (
-                            <button
-                              type="button"
-                              className="catalog__chip catalog__chip--more"
-                              onClick={() => toggleCategorySizes(group.category)}
-                              aria-expanded={expanded}
-                            >
-                              {expanded
-                                ? 'Свернуть'
-                                : `Все размеры (${group.chips.length})`}
-                            </button>
-                          )}
+                groupedSizesExpanded ? (
+                  <>
+                    <div className="catalog__size-groups catalog__size-groups--all">
+                      <button
+                        type="button"
+                        className={`catalog__chip ${sizeGroup === '' ? 'catalog__chip--active' : ''}`}
+                        onClick={() => setSizeGroup('')}
+                      >
+                        Все размеры
+                      </button>
+                    </div>
+
+                    <div className="catalog__size-sections">
+                      {sizeGroupsByCategory.map((group) => (
+                        <div key={group.category} className="catalog__size-section">
+                          <p className="catalog__size-section-title">{group.label}</p>
+                          <div className="catalog__size-groups">
+                            {group.chips.map((chip) => (
+                              <button
+                                key={`${group.category}-${chip}`}
+                                type="button"
+                                className={`catalog__chip catalog__chip--group ${sizeGroup === chip ? 'catalog__chip--active' : ''}`}
+                                onClick={() => setSizeGroup(chip)}
+                              >
+                                {chip}
+                              </button>
+                            ))}
+                          </div>
                         </div>
+                      ))}
+                    </div>
+
+                    {canExpandGroupedSizes && (
+                      <div className="catalog__size-groups catalog__size-groups--toggle">
+                        <button
+                          type="button"
+                          className="catalog__chip catalog__chip--more"
+                          onClick={() => {
+                            setSizeGroupsExpanded(false)
+                            if (selectedOutsidePassenger) setSizeGroup('')
+                          }}
+                          aria-expanded
+                        >
+                          Свернуть
+                        </button>
                       </div>
-                    )
-                  })}
-                </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="catalog__size-groups">
+                    <button
+                      type="button"
+                      className={`catalog__chip ${sizeGroup === '' ? 'catalog__chip--active' : ''}`}
+                      onClick={() => setSizeGroup('')}
+                    >
+                      Все размеры
+                    </button>
+                    {collapsedPassengerChips.map((chip) => (
+                      <button
+                        key={`passenger-${chip}`}
+                        type="button"
+                        className={`catalog__chip catalog__chip--group ${sizeGroup === chip ? 'catalog__chip--active' : ''}`}
+                        onClick={() => setSizeGroup(chip)}
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                    {canExpandGroupedSizes && (
+                      <button
+                        type="button"
+                        className="catalog__chip catalog__chip--more"
+                        onClick={() => setSizeGroupsExpanded(true)}
+                        aria-expanded={false}
+                      >
+                        Все размеры ({totalGroupedSizeCount})
+                      </button>
+                    )}
+                  </div>
+                )
               ) : (
                 <div className="catalog__size-groups">
+                  <button
+                    type="button"
+                    className={`catalog__chip ${sizeGroup === '' ? 'catalog__chip--active' : ''}`}
+                    onClick={() => setSizeGroup('')}
+                  >
+                    Все размеры
+                  </button>
                   {previewSizeGroups.map((group) => (
                     <button
                       key={group}
