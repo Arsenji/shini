@@ -14,6 +14,7 @@ import {
   type ShopSizeFilters,
 } from '../data/shop'
 import { ShopCard } from './shop/ShopCard'
+import { formatCountRu } from '../lib/pluralizeRu'
 
 const categoryFilters: ShopCategoryFilter[] = [
   'all',
@@ -237,7 +238,11 @@ export function Catalog() {
             <p className="section__tag section__tag--highlight">Каталог</p>
             <h2 className="section__title">Все товары в наличии</h2>
             <p className="catalog__subtitle">
-              {stats.total} моделей · {stats.brands} брендов · {stats.sizes} размеров
+              {formatCountRu(stats.total, 'модель', 'модели', 'моделей')}
+              {' · '}
+              {formatCountRu(stats.brands, 'бренд', 'бренда', 'брендов')}
+              {' · '}
+              {formatCountRu(stats.sizes, 'размер', 'размера', 'размеров')}
             </p>
           </div>
         </div>
