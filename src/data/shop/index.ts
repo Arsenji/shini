@@ -1,5 +1,6 @@
 import { shopProducts } from './products'
-import type { ShopCategoryFilter, ShopProduct, ShopSeason } from './types'
+import type { ShopCategory, ShopCategoryFilter, ShopProduct, ShopSeason } from './types'
+import { shopCategoryLabels } from './types'
 
 export * from './types'
 export { shopProducts } from './products'
@@ -40,7 +41,7 @@ export function getProductSizeParts(product: ShopProduct): ParsedTireSize[] {
 
 function matchesSeason(product: ShopProduct, season: ShopSeason | 'all'): boolean {
   if (season === 'all') return true
-  // Коммерческие без сезона показываем всегда
+  // Диски / камеры / ленты / грузовые без сезона — показываем при любом сезоне
   if (!product.season) return true
   if (product.season === 'allseason') return true
   return product.season === season
@@ -63,12 +64,25 @@ export function filterShopProducts(
   category: ShopCategoryFilter,
   season: ShopSeason | 'all',
   sizeFilters: ShopSizeFilters,
+  color = '',
 ): ShopProduct[] {
   return products.filter((product) => {
     if (category !== 'all' && product.category !== category) return false
     if (!matchesSeason(product, season)) return false
+    if (color && product.color !== color) return false
     return matchesSizeFilters(product, sizeFilters)
   })
+}
+
+/** Уникальные цвета дисков (для фильтра каталога) */
+export function getDiskColors(products: ShopProduct[]): string[] {
+  const colors = new Set<string>()
+  for (const product of products) {
+    if (product.category === 'disk' && product.color) {
+      colors.add(product.color)
+    }
+  }
+  return Array.from(colors).sort((a, b) => a.localeCompare(b, 'ru'))
 }
 
 /** Уникальные значения ширины/профиля/диаметра с учётом уже выбранных фильтров */
@@ -111,11 +125,18 @@ export function getUniqueSizeGroups(products: ShopProduct[]): string[] {
 
 /**
  * Чипы размерной сетки: sizeGroup (если есть) или все sizes товара.
+ * У дисков sizeGroup / sizes — полная спецификация (5x13 4x98 ET35 58,6).
  * Уже отфильтрованный список (категория + сезон) передавайте снаружи.
  */
 export function getCatalogSizeChips(products: ShopProduct[]): string[] {
   const chips = new Set<string>()
   for (const product of products) {
+    if (product.category === 'disk') {
+      for (const size of product.sizes) {
+        chips.add(size)
+      }
+      continue
+    }
     if (product.sizeGroup) {
       chips.add(product.sizeGroup)
       continue
@@ -125,6 +146,35 @@ export function getCatalogSizeChips(products: ShopProduct[]): string[] {
     }
   }
   return Array.from(chips).sort(compareTireSizes)
+}
+
+const SIZE_CHIP_CATEGORY_ORDER: ShopCategory[] = [
+  'passenger',
+  'lcv',
+  'truck',
+  'disk',
+  'tube',
+  'rimTape',
+]
+
+/** Размеры, сгруппированные по типу товара (для режима «Все») */
+export function getCatalogSizeChipsGrouped(
+  products: ShopProduct[],
+): { category: ShopCategory; label: string; chips: string[] }[] {
+  const byCategory = new Map<ShopCategory, ShopProduct[]>()
+  for (const product of products) {
+    const list = byCategory.get(product.category)
+    if (list) list.push(product)
+    else byCategory.set(product.category, [product])
+  }
+
+  return SIZE_CHIP_CATEGORY_ORDER.flatMap((category) => {
+    const groupProducts = byCategory.get(category)
+    if (!groupProducts?.length) return []
+    const chips = getCatalogSizeChips(groupProducts)
+    if (!chips.length) return []
+    return [{ category, label: shopCategoryLabels[category], chips }]
+  })
 }
 
 export function productMatchesSizeChip(product: ShopProduct, chip: string): boolean {
@@ -138,6 +188,13 @@ function compareTireSizes(a: string, b: string): number {
     const metric = value.match(/^(\d+)\/(\d+)R([\d.]+)(C)?$/i)
     if (metric) {
       return [0, Number(metric[1]), Number(metric[2]), Number(metric[3]), metric[4] ? 1 : 0] as const
+    }
+    // Диски: 5x13 4x98… / R15 4x100… / 6.75x19.5…
+    const disk = value.match(
+      /^(?:R\s*)?(\d+(?:\.\d+)?)\s*[xх×-]?\s*(\d+(?:\.\d+)?)?/i,
+    )
+    if (disk && /[xх×Rr-]|\d+\s+\d/.test(value)) {
+      return [1, Number(disk[1]), Number(disk[2] || 0), 0, 0] as const
     }
     const alt = value.match(/^([\d.]+)[Rr-]([\d.]+)$/)
     if (alt) {

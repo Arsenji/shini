@@ -62,6 +62,7 @@ export function ShopCard({ product }: ShopCardProps) {
 
         <h3 className="shop-card__brand">{product.brand}</h3>
         <p className="shop-card__model">{product.model}</p>
+        <p className="shop-card__color">{product.color ?? ''}</p>
 
         {offers.length > 0 && (
           <div className="shop-card__size-picker" role="group" aria-label="Размеры">

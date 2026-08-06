@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import {
   filterShopProducts,
   getCatalogSizeChips,
+  getCatalogSizeChipsGrouped,
+  getDiskColors,
   getShopStats,
   getSizeFilterOptions,
   productMatchesSizeChip,
@@ -13,7 +15,15 @@ import {
 } from '../data/shop'
 import { ShopCard } from './shop/ShopCard'
 
-const categoryFilters: ShopCategoryFilter[] = ['all', 'passenger', 'lcv', 'truck']
+const categoryFilters: ShopCategoryFilter[] = [
+  'all',
+  'passenger',
+  'lcv',
+  'truck',
+  'disk',
+  'tube',
+  'rimTape',
+]
 const PAGE_SIZE = 12
 /** Сколько номеров страниц показывать; окна: 1–10 ↔ 10–19 ↔ 19–28… */
 const PAGE_WINDOW = 10
@@ -25,21 +35,36 @@ const emptySizeFilters: ShopSizeFilters = {
   diameter: '',
 }
 
+function previewChips(chips: string[], expanded: boolean, selected: string): string[] {
+  if (expanded || chips.length <= SIZE_GROUP_PREVIEW) return chips
+  const preview = chips.slice(0, SIZE_GROUP_PREVIEW)
+  if (selected && !preview.includes(selected) && chips.includes(selected)) {
+    return [...preview.slice(0, Math.max(0, SIZE_GROUP_PREVIEW - 1)), selected]
+  }
+  return preview
+}
+
 export function Catalog() {
   const [category, setCategory] = useState<ShopCategoryFilter>('all')
   const [season, setSeason] = useState<ShopSeason>('summer')
   const [sizeFilters, setSizeFilters] = useState<ShopSizeFilters>(emptySizeFilters)
   const [sizeGroup, setSizeGroup] = useState('')
+  const [diskColor, setDiskColor] = useState('')
   const [sizeGroupsExpanded, setSizeGroupsExpanded] = useState(false)
+  const [expandedSizeCategories, setExpandedSizeCategories] = useState<Record<string, boolean>>({})
   const [page, setPage] = useState(1)
   const [pageWindowStart, setPageWindowStart] = useState(1)
 
   const stats = useMemo(() => getShopStats(shopProducts), [])
+  const showDiskColor = category === 'disk'
+  const showGroupedSizes = category === 'all'
 
   const categoryProducts = useMemo(
     () => filterShopProducts(shopProducts, category, season, emptySizeFilters),
     [category, season],
   )
+
+  const diskColors = useMemo(() => getDiskColors(categoryProducts), [categoryProducts])
 
   const sizeOptions = useMemo(
     () => getSizeFilterOptions(categoryProducts, sizeFilters),
@@ -47,10 +72,16 @@ export function Catalog() {
   )
 
   const filtered = useMemo(() => {
-    const byFilters = filterShopProducts(shopProducts, category, season, sizeFilters)
+    const byFilters = filterShopProducts(
+      shopProducts,
+      category,
+      season,
+      sizeFilters,
+      showDiskColor ? diskColor : '',
+    )
     if (!sizeGroup) return byFilters
     return byFilters.filter((p) => productMatchesSizeChip(p, sizeGroup))
-  }, [category, season, sizeFilters, sizeGroup])
+  }, [category, season, sizeFilters, sizeGroup, diskColor, showDiskColor])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
 
@@ -59,30 +90,46 @@ export function Catalog() {
     [categoryProducts],
   )
 
+  const sizeGroupsByCategory = useMemo(
+    () => getCatalogSizeChipsGrouped(categoryProducts),
+    [categoryProducts],
+  )
+
   const hasMoreSizeGroups = visibleSizeGroups.length > SIZE_GROUP_PREVIEW
-  const previewSizeGroups = useMemo(() => {
-    if (sizeGroupsExpanded || !hasMoreSizeGroups) return visibleSizeGroups
-    const preview = visibleSizeGroups.slice(0, SIZE_GROUP_PREVIEW)
-    if (sizeGroup && !preview.includes(sizeGroup)) {
-      return [...preview.slice(0, Math.max(0, SIZE_GROUP_PREVIEW - 1)), sizeGroup]
+  const previewSizeGroups = useMemo(
+    () => previewChips(visibleSizeGroups, sizeGroupsExpanded, sizeGroup),
+    [visibleSizeGroups, sizeGroupsExpanded, sizeGroup],
+  )
+
+  const allSizeChips = useMemo(() => {
+    if (showGroupedSizes) {
+      return sizeGroupsByCategory.flatMap((group) => group.chips)
     }
-    return preview
-  }, [visibleSizeGroups, sizeGroupsExpanded, hasMoreSizeGroups, sizeGroup])
+    return visibleSizeGroups
+  }, [showGroupedSizes, sizeGroupsByCategory, visibleSizeGroups])
 
   useEffect(() => {
     setPage(1)
     setPageWindowStart(1)
-  }, [category, season, sizeFilters, sizeGroup])
+  }, [category, season, sizeFilters, sizeGroup, diskColor])
 
   useEffect(() => {
     setSizeGroupsExpanded(false)
+    setExpandedSizeCategories({})
+    setDiskColor('')
   }, [category, season])
 
   useEffect(() => {
-    if (sizeGroup && !visibleSizeGroups.includes(sizeGroup)) {
+    if (sizeGroup && !allSizeChips.includes(sizeGroup)) {
       setSizeGroup('')
     }
-  }, [visibleSizeGroups, sizeGroup])
+  }, [allSizeChips, sizeGroup])
+
+  useEffect(() => {
+    if (diskColor && !diskColors.includes(diskColor)) {
+      setDiskColor('')
+    }
+  }, [diskColors, diskColor])
 
   useEffect(() => {
     if (page > totalPages) setPage(totalPages)
@@ -137,10 +184,8 @@ export function Catalog() {
       const isLastInWindow = target === windowEnd
 
       if (isFirstInWindow && pageWindowStart > 1) {
-        // 10–19 → клик 10 → окно 1–10
         setPageWindowStart(Math.max(1, pageWindowStart - step))
       } else if (isLastInWindow && target < totalPages) {
-        // 1–10 → клик 10 → окно 10–19
         setPageWindowStart(target)
       } else if (target < pageWindowStart) {
         setPageWindowStart(Math.max(1, pageWindowStart - step))
@@ -157,13 +202,24 @@ export function Catalog() {
     setSizeFilters((prev) => ({ ...prev, [key]: value }))
   }
 
+  function toggleCategorySizes(categoryKey: string) {
+    setExpandedSizeCategories((prev) => ({
+      ...prev,
+      [categoryKey]: !prev[categoryKey],
+    }))
+  }
+
+  const hasAnySizeChips = showGroupedSizes
+    ? sizeGroupsByCategory.some((group) => group.chips.length > 0)
+    : visibleSizeGroups.length > 0
+
   return (
     <section id="catalog" className="section catalog">
       <div className="container">
         <div className="section__header section__header--row">
           <div>
             <p className="section__tag section__tag--highlight">Каталог</p>
-            <h2 className="section__title">Шины в наличии</h2>
+            <h2 className="section__title">Все товары в наличии</h2>
             <p className="catalog__subtitle">
               {stats.total} моделей · {stats.brands} брендов · {stats.sizes} размеров
             </p>
@@ -216,7 +272,7 @@ export function Catalog() {
             </div>
           </div>
 
-          <div className="catalog__dims">
+          <div className={`catalog__dims${showDiskColor ? ' catalog__dims--with-color' : ''}`}>
             <label className="catalog__dim">
               <span className="catalog__field-label">Ширина, мм</span>
               <select
@@ -264,12 +320,32 @@ export function Catalog() {
                 ))}
               </select>
             </label>
+
+            {showDiskColor && (
+              <label className="catalog__dim">
+                <span className="catalog__field-label">Цвет</span>
+                <select
+                  className="catalog__select"
+                  value={diskColor}
+                  onChange={(e) => setDiskColor(e.target.value)}
+                  aria-label="Цвет диска"
+                >
+                  <option value="">Все</option>
+                  {diskColors.map((color) => (
+                    <option key={color} value={color}>
+                      {color}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
           </div>
 
-          {visibleSizeGroups.length > 0 && (
+          {hasAnySizeChips && (
             <div className="catalog__size-groups-block">
               <span className="catalog__field-label">Размеры</span>
-              <div className="catalog__size-groups">
+
+              <div className="catalog__size-groups catalog__size-groups--all">
                 <button
                   type="button"
                   className={`catalog__chip ${sizeGroup === '' ? 'catalog__chip--active' : ''}`}
@@ -277,29 +353,71 @@ export function Catalog() {
                 >
                   Все размеры
                 </button>
-                {previewSizeGroups.map((group) => (
-                  <button
-                    key={group}
-                    type="button"
-                    className={`catalog__chip catalog__chip--group ${sizeGroup === group ? 'catalog__chip--active' : ''}`}
-                    onClick={() => setSizeGroup(group)}
-                  >
-                    {group}
-                  </button>
-                ))}
-                {hasMoreSizeGroups && (
-                  <button
-                    type="button"
-                    className="catalog__chip catalog__chip--more"
-                    onClick={() => setSizeGroupsExpanded((open) => !open)}
-                    aria-expanded={sizeGroupsExpanded}
-                  >
-                    {sizeGroupsExpanded
-                      ? 'Свернуть'
-                      : `Все размеры (${visibleSizeGroups.length})`}
-                  </button>
-                )}
               </div>
+
+              {showGroupedSizes ? (
+                <div className="catalog__size-sections">
+                  {sizeGroupsByCategory.map((group) => {
+                    const expanded = Boolean(expandedSizeCategories[group.category])
+                    const hasMore = group.chips.length > SIZE_GROUP_PREVIEW
+                    const chips = previewChips(group.chips, expanded, sizeGroup)
+                    return (
+                      <div key={group.category} className="catalog__size-section">
+                        <p className="catalog__size-section-title">{group.label}</p>
+                        <div className="catalog__size-groups">
+                          {chips.map((chip) => (
+                            <button
+                              key={`${group.category}-${chip}`}
+                              type="button"
+                              className={`catalog__chip catalog__chip--group ${sizeGroup === chip ? 'catalog__chip--active' : ''}`}
+                              onClick={() => setSizeGroup(chip)}
+                            >
+                              {chip}
+                            </button>
+                          ))}
+                          {hasMore && (
+                            <button
+                              type="button"
+                              className="catalog__chip catalog__chip--more"
+                              onClick={() => toggleCategorySizes(group.category)}
+                              aria-expanded={expanded}
+                            >
+                              {expanded
+                                ? 'Свернуть'
+                                : `Все размеры (${group.chips.length})`}
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="catalog__size-groups">
+                  {previewSizeGroups.map((group) => (
+                    <button
+                      key={group}
+                      type="button"
+                      className={`catalog__chip catalog__chip--group ${sizeGroup === group ? 'catalog__chip--active' : ''}`}
+                      onClick={() => setSizeGroup(group)}
+                    >
+                      {group}
+                    </button>
+                  ))}
+                  {hasMoreSizeGroups && (
+                    <button
+                      type="button"
+                      className="catalog__chip catalog__chip--more"
+                      onClick={() => setSizeGroupsExpanded((open) => !open)}
+                      aria-expanded={sizeGroupsExpanded}
+                    >
+                      {sizeGroupsExpanded
+                        ? 'Свернуть'
+                        : `Все размеры (${visibleSizeGroups.length})`}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

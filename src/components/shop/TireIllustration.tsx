@@ -65,6 +65,47 @@ export function TireIllustration({ imageKey, className = '' }: TireIllustrationP
     )
   }
 
+  if (imageKey === 'disk') {
+    return (
+      <svg className={className} viewBox="0 0 160 160" aria-hidden="true">
+        {hubGradient}
+        <circle cx="80" cy="80" r="62" fill="none" stroke="#1B2D45" strokeWidth="10" />
+        <circle cx="80" cy="80" r="46" fill="none" stroke="#8BA4B4" strokeWidth="2" opacity="0.5" />
+        <g fill={`url(#${hubId})`} stroke="#1B2D45" strokeWidth="1.5">
+          <polygon points="80,28 88,62 80,54 72,62" />
+          <polygon points="132,80 98,88 106,80 98,72" />
+          <polygon points="80,132 72,98 80,106 88,98" />
+          <polygon points="28,80 62,72 54,80 62,88" />
+          <polygon points="116,44 98,72 102,64 90,68" />
+        </g>
+        <circle cx="80" cy="80" r="18" fill={`url(#${hubId})`} stroke="#1B2D45" strokeWidth="2" />
+        <circle cx="80" cy="80" r="6" fill="#1B2D45" opacity="0.2" />
+      </svg>
+    )
+  }
+
+  if (imageKey === 'tube') {
+    return (
+      <svg className={className} viewBox="0 0 160 160" aria-hidden="true">
+        {hubGradient}
+        <circle cx="80" cy="80" r="54" fill="none" stroke="#1B2D45" strokeWidth="18" />
+        <circle cx="80" cy="80" r="34" fill="none" stroke="#8BA4B4" strokeWidth="2" opacity="0.45" />
+        <rect x="112" y="34" width="10" height="22" rx="3" fill={`url(#${hubId})`} stroke="#1B2D45" strokeWidth="1.5" />
+      </svg>
+    )
+  }
+
+  if (imageKey === 'rimTape') {
+    return (
+      <svg className={className} viewBox="0 0 160 160" aria-hidden="true">
+        {hubGradient}
+        <circle cx="80" cy="80" r="58" fill="none" stroke="#1B2D45" strokeWidth="8" />
+        <circle cx="80" cy="80" r="48" fill="none" stroke={`url(#${hubId})`} strokeWidth="6" />
+        <circle cx="80" cy="80" r="38" fill="none" stroke="#1B2D45" strokeWidth="2" opacity="0.35" />
+      </svg>
+    )
+  }
+
   return (
     <svg className={className} viewBox="0 0 160 160" aria-hidden="true">
       {hubGradient}

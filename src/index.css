@@ -829,6 +829,10 @@ select.input {
   gap: 14px;
 }
 
+.catalog__dims--with-color {
+  grid-template-columns: repeat(4, 1fr);
+}
+
 .catalog__dim {
   display: flex;
   flex-direction: column;
@@ -892,6 +896,23 @@ select.input {
   margin-bottom: 0;
 }
 
+.catalog__size-groups--all {
+  margin-bottom: 12px;
+}
+
+.catalog__size-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.catalog__size-section-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
 .catalog__chip {
   padding: 8px 14px;
   border-radius: var(--radius-pill);
@@ -903,6 +924,9 @@ select.input {
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.25;
 }
 
 .catalog__chip:hover:not(.catalog__chip--active) {
@@ -1046,6 +1070,7 @@ select.input {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+  align-items: stretch;
 }
 
 .shop-card {
@@ -1057,6 +1082,7 @@ select.input {
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .shop-card:hover {
@@ -1138,7 +1164,26 @@ select.input {
 .shop-card__model {
   font-size: 14px;
   color: var(--text-muted);
-  margin: 2px 0 10px;
+  margin: 2px 0 4px;
+  min-height: 1.35em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shop-card__color {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0 0 10px;
+  min-height: 1.35em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.shop-card__color:empty {
+  visibility: hidden;
 }
 
 .shop-card__size-picker {
@@ -1928,15 +1973,9 @@ a.contact__detail-value:hover {
 
   .catalog__filters {
     width: 100%;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .catalog__filters::-webkit-scrollbar {
-    display: none;
+    flex-wrap: wrap;
+    overflow-x: visible;
+    padding-bottom: 0;
   }
 
   .catalog__filter {

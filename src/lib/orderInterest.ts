@@ -10,6 +10,7 @@ export type OrderInterest = {
   category: string
   season?: string
   sizeGroup?: string
+  color?: string
   sizes: string[]
   /** Размер для поля формы (выбранный на карточке) */
   preferredSize: string
@@ -37,6 +38,7 @@ export function productToOrderInterest(
     category: product.category,
     season: product.season,
     sizeGroup: product.sizeGroup,
+    color: product.color ?? undefined,
     sizes: offers.map((o) => o.size),
     preferredSize,
     price,

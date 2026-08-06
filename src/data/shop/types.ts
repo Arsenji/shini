@@ -1,14 +1,14 @@
-/** Категория шины — для фильтров и иллюстраций */
-export type ShopCategory = 'passenger' | 'lcv' | 'truck'
+/** Категория товара — для фильтров и иллюстраций */
+export type ShopCategory = 'passenger' | 'lcv' | 'truck' | 'disk' | 'tube' | 'rimTape'
 
-/** Сезон (для легковых; у коммерческих обычно null) */
+/** Сезон (для шин; у дисков/камер/лент обычно null) */
 export type ShopSeason = 'summer' | 'winter' | 'allseason'
 
 /**
  * Ключ иллюстрации. Добавляйте новые SVG в TireIllustration
  * и прописывайте сюда при появлении новых типов.
  */
-export type ShopImageKey = 'passenger' | 'lcv' | 'truck'
+export type ShopImageKey = 'passenger' | 'lcv' | 'truck' | 'disk' | 'tube' | 'rimTape'
 
 /** Размер с ценой — выбирается на карточке */
 export type ShopSizeOffer = {
@@ -34,8 +34,8 @@ export type ShopProduct = {
   category: ShopCategory
   season?: ShopSeason
   /**
-   * Группа размера для коммерческих шин
-   * (например "185/75R16C", "215/75R17.5")
+   * Группа размера для коммерческих шин / дисков
+   * (например "185/75R16C", "R15 5х114.3")
    */
   sizeGroup?: string
   /** Какая SVG-иллюстрация показывать, если нет image */
@@ -51,6 +51,8 @@ export type ShopProduct = {
    */
   price?: number | null
   badge?: string | null
+  /** Цвет / покрытие диска (из прайса) */
+  color?: string | null
 }
 
 export type ShopCategoryFilter = 'all' | ShopCategory
@@ -60,6 +62,9 @@ export const shopCategoryLabels: Record<ShopCategoryFilter, string> = {
   passenger: 'Легковые',
   lcv: 'Легкогрузовые',
   truck: 'Грузовые',
+  disk: 'Диски',
+  tube: 'Камеры',
+  rimTape: 'Ободные ленты',
 }
 
 export const shopSeasonLabels: Record<ShopSeason, string> = {
