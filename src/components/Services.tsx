@@ -1,4 +1,5 @@
 import { services } from '../data'
+import { Link } from 'react-router-dom'
 
 export function Services() {
   return (
@@ -17,9 +18,9 @@ export function Services() {
                 <span className="service-card__price">{service.subtitle}</span>
               </div>
               <p className="service-card__desc">{service.description}</p>
-              <a href="#contact" className="service-card__link">
+              <Link to={{ pathname: '/', hash: 'contact' }} className="service-card__link">
                 Заказать →
-              </a>
+              </Link>
             </article>
           ))}
         </div>

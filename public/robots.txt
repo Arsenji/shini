@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.xn----7sbhhf0ahxgy4f1ee.xn--p1ai/sitemap.xml

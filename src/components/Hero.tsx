@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { useTypewriter } from '../hooks/useTypewriter'
 import { createOrder } from '../api/orders'
 import { digitsOnly, parseTireNumber, sanitizeNameInput, sanitizePhoneInput, validateName } from '../lib/sanitize'
@@ -90,12 +91,12 @@ export function Hero() {
             </span>
           </p>
           <div className="hero__actions">
-            <a href="#contact" className="btn btn--primary">
+            <Link to={{ pathname: '/', hash: 'contact' }} className="btn btn--primary">
               Узнать стоимость
-            </a>
-            <a href="#catalog" className="btn btn--outline">
+            </Link>
+            <Link to={{ pathname: '/', hash: 'catalog' }} className="btn btn--outline">
               Смотреть каталог
-            </a>
+            </Link>
           </div>
           </div>
 

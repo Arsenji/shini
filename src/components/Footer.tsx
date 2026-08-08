@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Logo } from './Logo'
 import { VK_URL } from './VkIcon'
 
@@ -6,18 +7,20 @@ export function Footer() {
     <footer className="footer">
       <div className="container footer__inner">
         <div className="footer__brand">
-          <a href="#" className="footer__logo-link">
+          <Link to="/" className="footer__logo-link">
             <Logo size="footer" showTagline />
-          </a>
+          </Link>
           <p className="footer__copy">© КОЛЁСА ДЁШЕВО, все права защищены.</p>
         </div>
 
         <nav className="footer__nav" aria-label="Навигация">
-          <a href="#catalog">Каталог</a>
-          <a href="#services">Услуги</a>
-          <a href="#about">Компания</a>
-          <a href="#contact">Контакты</a>
-          <a href="#public-offer">Публичная оферта</a>
+          <Link to={{ pathname: '/', hash: 'catalog' }}>Каталог</Link>
+          <Link to="/tires">Шины</Link>
+          <Link to="/wheels">Диски</Link>
+          <Link to={{ pathname: '/', hash: 'services' }}>Услуги</Link>
+          <Link to={{ pathname: '/', hash: 'about' }}>Компания</Link>
+          <Link to={{ pathname: '/', hash: 'contact' }}>Контакты</Link>
+          <Link to="/public-offer">Публичная оферта</Link>
           <a href={VK_URL} target="_blank" rel="noreferrer" aria-label="ВКонтакте">
             ВКонтакте
           </a>

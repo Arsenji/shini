@@ -10,13 +10,24 @@ import {
   shopCategoryLabels,
   shopProducts,
   type ShopCategoryFilter,
+  type ShopProduct,
   type ShopSeason,
   type ShopSizeFilters,
 } from '../data/shop'
+import { getTireProducts, getWheelProducts } from '../lib/productUrls'
 import { ShopCard } from './shop/ShopCard'
 import { formatCountRu } from '../lib/pluralizeRu'
 
-const categoryFilters: ShopCategoryFilter[] = [
+type CatalogMode = 'all' | 'tires' | 'wheels'
+
+type CatalogProps = {
+  mode?: CatalogMode
+  title?: string
+  headingLevel?: 'h1' | 'h2'
+  id?: string
+}
+
+const ALL_CATEGORY_FILTERS: ShopCategoryFilter[] = [
   'all',
   'passenger',
   'lcv',
@@ -25,6 +36,45 @@ const categoryFilters: ShopCategoryFilter[] = [
   'tube',
   'rimTape',
 ]
+
+const TIRE_CATEGORY_FILTERS: ShopCategoryFilter[] = ['all', 'passenger', 'lcv', 'truck']
+const WHEEL_CATEGORY_FILTERS: ShopCategoryFilter[] = ['disk']
+
+function productsForMode(mode: CatalogMode): ShopProduct[] {
+  if (mode === 'tires') return getTireProducts()
+  if (mode === 'wheels') return getWheelProducts()
+  return shopProducts
+}
+
+function resolveCategory(
+  mode: CatalogMode,
+  category: ShopCategoryFilter,
+): ShopCategoryFilter {
+  if (mode === 'wheels') return 'disk'
+  if (mode === 'tires' && category === 'all') return 'all'
+  if (mode === 'tires' && !['all', 'passenger', 'lcv', 'truck'].includes(category)) {
+    return 'all'
+  }
+  return category
+}
+
+function filterByModeCategory(
+  products: ShopProduct[],
+  mode: CatalogMode,
+  category: ShopCategoryFilter,
+  season: ShopSeason | 'all',
+  sizeFilters: ShopSizeFilters,
+  color = '',
+): ShopProduct[] {
+  return filterShopProducts(
+    products,
+    resolveCategory(mode, category),
+    season,
+    sizeFilters,
+    color,
+  )
+}
+
 const PAGE_SIZE = 12
 /** Сколько номеров страниц показывать; окна: 1–10 ↔ 10–19 ↔ 19–28… */
 const PAGE_WINDOW = 10
@@ -45,8 +95,22 @@ function previewChips(chips: string[], expanded: boolean, selected: string): str
   return preview
 }
 
-export function Catalog() {
-  const [category, setCategory] = useState<ShopCategoryFilter>('all')
+export function Catalog({
+  mode = 'all',
+  title,
+  headingLevel = 'h2',
+  id = 'catalog',
+}: CatalogProps) {
+  const sourceProducts = useMemo(() => productsForMode(mode), [mode])
+  const categoryFilters =
+    mode === 'tires'
+      ? TIRE_CATEGORY_FILTERS
+      : mode === 'wheels'
+        ? WHEEL_CATEGORY_FILTERS
+        : ALL_CATEGORY_FILTERS
+
+  const defaultCategory: ShopCategoryFilter = mode === 'wheels' ? 'disk' : 'all'
+  const [category, setCategory] = useState<ShopCategoryFilter>(defaultCategory)
   const [season, setSeason] = useState<ShopSeason>('summer')
   const [sizeFilters, setSizeFilters] = useState<ShopSizeFilters>(emptySizeFilters)
   const [sizeGroup, setSizeGroup] = useState('')
@@ -55,15 +119,25 @@ export function Catalog() {
   const [page, setPage] = useState(1)
   const [pageWindowStart, setPageWindowStart] = useState(1)
 
-  const stats = useMemo(() => getShopStats(shopProducts), [])
-  const showDiskFilters = category === 'disk'
-  const showAccessoryFilters = category === 'tube' || category === 'rimTape'
+  const stats = useMemo(() => getShopStats(sourceProducts), [sourceProducts])
+  const activeCategory = resolveCategory(mode, category)
+  const showDiskFilters = activeCategory === 'disk' || mode === 'wheels'
+  const showAccessoryFilters = activeCategory === 'tube' || activeCategory === 'rimTape'
   const showWidthDiameterFilters = showDiskFilters || showAccessoryFilters
-  const showGroupedSizes = category === 'all'
+  const showGroupedSizes = mode === 'all' && activeCategory === 'all'
+  const showTypeFilters = mode !== 'wheels'
+  const catalogTitle =
+    title ??
+    (mode === 'tires'
+      ? 'Каталог шин'
+      : mode === 'wheels'
+        ? 'Каталог дисков'
+        : 'Все товары в наличии')
+  const TitleTag = headingLevel
 
   const categoryProducts = useMemo(
-    () => filterShopProducts(shopProducts, category, season, emptySizeFilters),
-    [category, season],
+    () => filterByModeCategory(sourceProducts, mode, category, season, emptySizeFilters),
+    [sourceProducts, mode, category, season],
   )
 
   const diskColors = useMemo(() => getDiskColors(categoryProducts), [categoryProducts])
@@ -74,8 +148,9 @@ export function Catalog() {
   )
 
   const filtered = useMemo(() => {
-    const byFilters = filterShopProducts(
-      shopProducts,
+    const byFilters = filterByModeCategory(
+      sourceProducts,
+      mode,
       category,
       season,
       sizeFilters,
@@ -83,7 +158,7 @@ export function Catalog() {
     )
     if (!sizeGroup) return byFilters
     return byFilters.filter((p) => productMatchesSizeChip(p, sizeGroup))
-  }, [category, season, sizeFilters, sizeGroup, diskColor, showDiskFilters])
+  }, [sourceProducts, mode, category, season, sizeFilters, sizeGroup, diskColor, showDiskFilters])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
 
@@ -141,7 +216,17 @@ export function Catalog() {
     setSizeGroupsExpanded(false)
     setDiskColor('')
     setSizeFilters(emptySizeFilters)
+    setSizeGroup('')
   }, [category, season])
+
+  useEffect(() => {
+    setCategory(defaultCategory)
+    setSizeGroupsExpanded(false)
+    setDiskColor('')
+    setSizeFilters(emptySizeFilters)
+    setSizeGroup('')
+    setPage(1)
+  }, [mode, defaultCategory])
 
   useEffect(() => {
     if (sizeGroup && !allSizeChips.includes(sizeGroup)) {
@@ -219,7 +304,7 @@ export function Catalog() {
     }
 
     setPage(target)
-    document.getElementById('catalog')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   function updateSizeFilter(key: keyof ShopSizeFilters, value: string) {
@@ -233,12 +318,12 @@ export function Catalog() {
   const totalGroupedSizeCount = allSizeChips.length
 
   return (
-    <section id="catalog" className="section catalog">
+    <section id={id} className="section catalog">
       <div className="container">
         <div className="section__header section__header--row">
           <div>
             <p className="section__tag section__tag--highlight">Каталог</p>
-            <h2 className="section__title">Все товары в наличии</h2>
+            <TitleTag className="section__title">{catalogTitle}</TitleTag>
             <p className="catalog__subtitle">
               {formatCountRu(stats.total, 'модель', 'модели', 'моделей')}
               {' · '}
@@ -250,24 +335,28 @@ export function Catalog() {
         </div>
 
         <div className="catalog__size-panel">
-          <div className="catalog__category">
-            <span className="catalog__field-label">Тип</span>
-            <div className="catalog__filters" role="tablist" aria-label="Категория шин">
-              {categoryFilters.map((filter) => (
-                <button
-                  key={filter}
-                  type="button"
-                  className={`catalog__filter ${category === filter ? 'catalog__filter--active' : ''}`}
-                  onClick={() => {
-                    setCategory(filter)
-                    setSizeGroup('')
-                  }}
-                >
-                  {shopCategoryLabels[filter]}
-                </button>
-              ))}
+          {showTypeFilters && (
+            <div className="catalog__category">
+              <span className="catalog__field-label">Тип</span>
+              <div className="catalog__filters" role="tablist" aria-label="Категория">
+                {categoryFilters.map((filter) => (
+                  <button
+                    key={filter}
+                    type="button"
+                    className={`catalog__filter ${category === filter ? 'catalog__filter--active' : ''}`}
+                    onClick={() => {
+                      setCategory(filter)
+                      setSizeGroup('')
+                    }}
+                  >
+                    {filter === 'all' && mode === 'tires'
+                      ? 'Все шины'
+                      : shopCategoryLabels[filter]}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="catalog__season">
             <span className="catalog__field-label">Сезон</span>

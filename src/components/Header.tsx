@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Logo } from './Logo'
 import { VK_URL, VkIcon } from './VkIcon'
 
 const navLinks = [
-  { href: '#catalog', label: 'Каталог' },
-  { href: '#services', label: 'Услуги' },
-  { href: '#about', label: 'Компания' },
-  { href: '#contact', label: 'Контакты' },
-]
+  { to: { pathname: '/', hash: 'catalog' }, label: 'Каталог' },
+  { to: '/tires', label: 'Шины' },
+  { to: '/wheels', label: 'Диски' },
+  { to: { pathname: '/', hash: 'services' }, label: 'Услуги' },
+  { to: { pathname: '/', hash: 'about' }, label: 'Компания' },
+  { to: { pathname: '/', hash: 'contact' }, label: 'Контакты' },
+] as const
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false)
@@ -31,20 +34,20 @@ export function Header() {
   return (
     <header className={`header ${scrolled ? 'header--scrolled' : ''}`}>
       <div className="container header__inner">
-        <a href="#" className="header__logo-link" onClick={closeMenu}>
+        <Link to="/" className="header__logo-link" onClick={closeMenu}>
           <Logo />
-        </a>
+        </Link>
 
         <nav className={`header__nav ${menuOpen ? 'header__nav--open' : ''}`}>
           {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
+            <Link
+              key={link.label}
+              to={link.to}
               className="header__link"
               onClick={closeMenu}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
           <div className="header__nav-actions">
             <a
@@ -56,9 +59,13 @@ export function Header() {
             >
               <VkIcon />
             </a>
-            <a href="#contact" className="btn btn--primary" onClick={closeMenu}>
+            <Link
+              to={{ pathname: '/', hash: 'contact' }}
+              className="btn btn--primary"
+              onClick={closeMenu}
+            >
               Подобрать шины
-            </a>
+            </Link>
           </div>
         </nav>
 
@@ -72,9 +79,9 @@ export function Header() {
           >
             <VkIcon />
           </a>
-          <a href="#contact" className="btn btn--primary btn--sm">
+          <Link to={{ pathname: '/', hash: 'contact' }} className="btn btn--primary btn--sm">
             Подобрать шины
-          </a>
+          </Link>
         </div>
 
         <button

@@ -1,10 +1,12 @@
+import { Link } from 'react-router-dom'
+
 export function PublicOffer() {
   return (
     <section className="section legal-page" aria-labelledby="public-offer-title">
       <div className="container legal-page__inner">
-        <a href="#" className="legal-page__back">
+        <Link to="/" className="legal-page__back">
           ← На главную
-        </a>
+        </Link>
 
         <p className="section__tag section__tag--highlight">Документы</p>
         <h1 id="public-offer-title" className="section__title legal-page__title">
