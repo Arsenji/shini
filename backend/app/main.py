@@ -71,11 +71,11 @@ if STATIC_DIR.is_dir():
     if ASSETS_DIR.is_dir():
         app.mount("/assets", StaticFiles(directory=ASSETS_DIR), name="assets")
 
-    @app.get("/")
+    @app.get("/", response_model=None)
     def spa_root() -> FileResponse:
         return _spa_index()
 
-    @app.get("/{full_path:path}")
+    @app.get("/{full_path:path}", response_model=None)
     def spa_or_static(full_path: str) -> FileResponse | RedirectResponse:
         """Serve real static files; otherwise fall back to SPA index for client routes."""
         if full_path.startswith("api/") or full_path == "health":
