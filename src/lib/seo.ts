@@ -1,5 +1,5 @@
 /** Production site origin for canonical, OG, sitemap */
-export const SITE_ORIGIN = 'https://www.xn----7sbhhf0ahxgy4f1ee.xn--p1ai'
+export const SITE_ORIGIN = 'https://xn----7sbhhcda8aj3ai3a9g.shop'
 
 export function absoluteUrl(path = '/'): string {
   if (!path || path === '/') return `${SITE_ORIGIN}/`
