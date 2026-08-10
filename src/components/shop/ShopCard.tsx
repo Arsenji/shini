@@ -90,7 +90,7 @@ export function ShopCard({ product }: ShopCardProps) {
 
         <h3 className="shop-card__brand">{product.brand}</h3>
         <p className="shop-card__model">{product.model}</p>
-        <p className="shop-card__color">{product.color ?? ''}</p>
+        <p className="shop-card__color">{product.color ?? product.truckSpecs ?? ''}</p>
 
         {offers.length > 0 && (
           <div className="shop-card__size-picker" role="group" aria-label="Размеры">
@@ -155,7 +155,9 @@ export function ShopCard({ product }: ShopCardProps) {
               ×
             </button>
             <p className="shop-card__popup-meta">
-              {[categoryLabel, seasonLabel, product.color].filter(Boolean).join(' · ')}
+              {[categoryLabel, seasonLabel, product.color, product.truckSpecs]
+                .filter(Boolean)
+                .join(' · ')}
             </p>
             <p className="shop-card__popup-title">
               {product.brand} {product.model}

@@ -53,6 +53,10 @@ export type ShopProduct = {
   badge?: string | null
   /** Цвет / покрытие диска (из прайса) */
   color?: string | null
+  /**
+   * Грузовые: слойность, индекс нагрузки, производитель и пр. (строка из прайса)
+   */
+  truckSpecs?: string | null
 }
 
 export type ShopCategoryFilter = 'all' | ShopCategory

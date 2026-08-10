@@ -121,7 +121,9 @@ export function RequestForm() {
                     {interest.brand} {interest.model}
                   </p>
                   <p className="request__interest-meta">
-                    {[categoryLabel, seasonLabel, interest.color].filter(Boolean).join(' · ')}
+                    {[categoryLabel, seasonLabel, interest.color, interest.truckSpecs]
+                      .filter(Boolean)
+                      .join(' · ')}
                   </p>
                   <p className="request__interest-sizes">
                     {interest.preferredSize
