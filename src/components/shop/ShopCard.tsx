@@ -9,6 +9,7 @@ import {
 } from '../../data/shop'
 import { productToOrderInterest, setOrderInterest } from '../../lib/orderInterest'
 import { canonicalProductOfferPath } from '../../lib/productUrls'
+import { resolveTireSpecs } from '../../lib/tireSpecs'
 import { TireIllustration } from './TireIllustration'
 
 type ShopCardProps = {
@@ -19,6 +20,43 @@ const PREVIEW_SIZES = 2
 
 function formatPrice(price: number): string {
   return `${price.toLocaleString('ru-RU')} ₽`
+}
+
+function compactSpec(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/\./g, '')
+    .replace(/к/g, 'k')
+    .replace(/м/g, 'm')
+}
+
+function cleanupTruckSpecs(raw: string, plyRating: string | null, loadIndex: string | null): string {
+  let value = raw
+  if (plyRating) {
+    const m = plyRating.match(/^(\d{1,2})\s*слоев$/i)
+    if (m) {
+      const n = m[1]
+      value = value.replace(new RegExp(`(^|[\\s(])${n}\\s*сл\\.?($|[\\s).,;:/-])`, 'gi'), ' ')
+      value = value.replace(new RegExp(`(^|[\\s(])сл\\.?\\s*${n}($|[\\s).,;:/-])`, 'gi'), ' ')
+    }
+    const pr = plyRating.match(/^(\d{1,2})\s*PR$/i)
+    if (pr) {
+      const n = pr[1]
+      value = value.replace(new RegExp(`(^|[\\s(])${n}\\s*PR($|[\\s).,;:/-])`, 'gi'), ' ')
+      value = value.replace(new RegExp(`(^|[\\s(])PR\\s*${n}($|[\\s).,;:/-])`, 'gi'), ' ')
+    }
+  }
+  if (loadIndex) {
+    const idx = loadIndex.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    value = value.replace(new RegExp(`\\b${idx}\\b`, 'gi'), ' ')
+  }
+  return value
+    .replace(/^\(([^)]+)\)$/, '$1')
+    .replace(/\(\s*\)/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/[.,;:\-–—]\s*$/g, '')
+    .trim()
 }
 
 export function ShopCard({ product }: ShopCardProps) {
@@ -36,6 +74,24 @@ export function ShopCard({ product }: ShopCardProps) {
   const visibleOffers =
     sizesExpanded || !hasMoreSizes ? offers : offers.slice(0, PREVIEW_SIZES)
   const detailsPath = selectedSize ? canonicalProductOfferPath(product, selectedSize) : null
+  const { plyRating, loadIndex } = resolveTireSpecs(product)
+  const plyLabel = plyRating ? `Слойность: ${plyRating}` : ''
+  const loadLabel = loadIndex ? `Индекс: ${loadIndex}` : ''
+  const truckSpecsRaw = product.truckSpecs?.trim() ?? ''
+  const truckSpecsClean = cleanupTruckSpecs(truckSpecsRaw, plyRating, loadIndex)
+  const plyVariants = plyRating
+    ? [
+        compactSpec(plyRating),
+        compactSpec(plyRating.replace(' слоев', 'сл')),
+        compactSpec(plyRating.replace('слоев', 'сл')),
+      ]
+    : []
+  const loadVariants = loadIndex ? [compactSpec(loadIndex)] : []
+  const showTruckSpecs = truckSpecsClean
+    ? !plyVariants.includes(compactSpec(truckSpecsRaw)) &&
+      !loadVariants.includes(compactSpec(truckSpecsRaw))
+    : false
+  const detailsLine = product.color ?? (showTruckSpecs ? truckSpecsClean : '')
 
   useEffect(() => {
     if (!infoOpen) return
@@ -90,7 +146,6 @@ export function ShopCard({ product }: ShopCardProps) {
 
         <h3 className="shop-card__brand">{product.brand}</h3>
         <p className="shop-card__model">{product.model}</p>
-        <p className="shop-card__color">{product.color ?? product.truckSpecs ?? ''}</p>
 
         {offers.length > 0 && (
           <div className="shop-card__size-picker" role="group" aria-label="Размеры">
@@ -117,6 +172,9 @@ export function ShopCard({ product }: ShopCardProps) {
             )}
           </div>
         )}
+        {detailsLine && <p className="shop-card__color">{detailsLine}</p>}
+        {plyLabel && <p className="shop-card__color">{plyLabel}</p>}
+        {loadLabel && <p className="shop-card__color">{loadLabel}</p>}
 
         <div className="shop-card__footer">
           <span className={hasPrice ? 'shop-card__price' : 'shop-card__price-note'}>
@@ -155,7 +213,7 @@ export function ShopCard({ product }: ShopCardProps) {
               ×
             </button>
             <p className="shop-card__popup-meta">
-              {[categoryLabel, seasonLabel, product.color, product.truckSpecs]
+              {[categoryLabel, seasonLabel, detailsLine, plyLabel, loadLabel]
                 .filter(Boolean)
                 .join(' · ')}
             </p>

@@ -119,6 +119,8 @@ function offerIdentityKey(offer: CatalogOffer): string {
     offer.product.season ?? '',
     offer.product.color ?? '',
     offer.product.truckSpecs ?? '',
+    offer.product.loadIndex ?? '',
+    offer.product.plyRating ?? '',
     offer.price ?? '',
     JSON.stringify(getProductOffers(offer.product)),
   ].join('\u0001')
@@ -248,6 +250,12 @@ export function formatOfferTitle(offer: CatalogOffer): string {
 
   if (product.truckSpecs) {
     parts.push(`— ${product.truckSpecs}`)
+  }
+  if (product.loadIndex) {
+    parts.push(product.loadIndex)
+  }
+  if (product.plyRating) {
+    parts.push(product.plyRating)
   }
 
   return parts.join(' ')

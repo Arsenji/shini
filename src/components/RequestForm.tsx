@@ -121,7 +121,14 @@ export function RequestForm() {
                     {interest.brand} {interest.model}
                   </p>
                   <p className="request__interest-meta">
-                    {[categoryLabel, seasonLabel, interest.color, interest.truckSpecs]
+                    {[
+                      categoryLabel,
+                      seasonLabel,
+                      interest.color,
+                      interest.truckSpecs,
+                      interest.plyRating ? `Слойность: ${interest.plyRating}` : null,
+                      interest.loadIndex ? `Индекс: ${interest.loadIndex}` : null,
+                    ]
                       .filter(Boolean)
                       .join(' · ')}
                   </p>

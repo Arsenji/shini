@@ -34,15 +34,39 @@ export function normalizeSize(value: string): string {
   return value.toLowerCase().replace(/\s+/g, '').replace(/,/g, '.')
 }
 
-/** Разбор 205/55R16, 215/75R17.5, 185/75R16C → width/profile/diameter */
+/** Разбор 205/55R16, 215/75R17.5, 185/75R16C, 8.25R20, 12R22.5, 14.00-20 */
 export function parseTireSize(value: string): ParsedTireSize | null {
-  const match = normalizeSize(value).match(/^(\d{3})\/(\d{2,3})r?(\d{2}(?:\.\d)?)(c)?$/)
-  if (!match) return null
-  return {
-    width: match[1],
-    profile: match[2],
-    diameter: match[4] ? `${match[3]}C` : match[3],
+  const normalized = normalizeSize(value)
+  const metric = normalized.match(/^(\d{3})\/(\d{2,3})r?(\d{2}(?:\.\d)?)(c)?$/)
+  if (metric) {
+    return {
+      width: metric[1],
+      profile: metric[2],
+      diameter: metric[4] ? `${metric[3]}C` : metric[3],
+    }
   }
+
+  // Грузовые форматы без профиля: 8.25R20, 12R22.5
+  const truck = normalized.match(/^(\d{1,2}(?:\.\d+)?)r(\d{2}(?:\.\d)?)(c)?$/)
+  if (truck) {
+    return {
+      width: truck[1],
+      profile: '',
+      diameter: truck[3] ? `${truck[2]}C` : truck[2],
+    }
+  }
+
+  // Диагональные грузовые: 14.00-20, 11.2-20
+  const diagonal = normalized.match(/^(\d{1,2}(?:\.\d+)?)-(\d{2}(?:\.\d+)?)(c)?$/)
+  if (diagonal) {
+    return {
+      width: diagonal[1],
+      profile: '',
+      diameter: diagonal[3] ? `${diagonal[2]}C` : diagonal[2],
+    }
+  }
+
+  return null
 }
 
 function formatDiskNumber(value: string): string {
@@ -278,7 +302,7 @@ export function getSizeFilterOptions(
       const diameterOk = !sizeFilters.diameter || part.diameter === sizeFilters.diameter
 
       if (profileOk && diameterOk) widths.add(part.width)
-      if (widthOk && diameterOk) profiles.add(part.profile)
+      if (widthOk && diameterOk && part.profile) profiles.add(part.profile)
       if (widthOk && profileOk) diameters.add(part.diameter)
     }
   }

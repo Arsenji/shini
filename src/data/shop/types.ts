@@ -57,6 +57,10 @@ export type ShopProduct = {
    * Грузовые: слойность, индекс нагрузки, производитель и пр. (строка из прайса)
    */
   truckSpecs?: string | null
+  /** Слойность (например "12 слоев", "16 PR") */
+  plyRating?: string | null
+  /** Индекс нагрузки + скорость (например "100T", "120/121R") */
+  loadIndex?: string | null
 }
 
 export type ShopCategoryFilter = 'all' | ShopCategory

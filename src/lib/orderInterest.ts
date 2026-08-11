@@ -1,4 +1,5 @@
 import { getOfferPrice, getProductOffers, type ShopProduct } from '../data/shop'
+import { resolveTireSpecs } from './tireSpecs'
 
 export const ORDER_INTEREST_EVENT = 'kolesa:order-interest'
 const STORAGE_KEY = 'kolesa_order_interest'
@@ -12,6 +13,8 @@ export type OrderInterest = {
   sizeGroup?: string
   color?: string
   truckSpecs?: string
+  plyRating?: string
+  loadIndex?: string
   sizes: string[]
   /** Размер для поля формы (выбранный на карточке) */
   preferredSize: string
@@ -31,6 +34,7 @@ export function productToOrderInterest(
     product.sizes[0] ||
     ''
   const price = preferredSize ? getOfferPrice(product, preferredSize) : product.price ?? null
+  const { plyRating, loadIndex } = resolveTireSpecs(product)
 
   return {
     productId: product.id,
@@ -41,6 +45,8 @@ export function productToOrderInterest(
     sizeGroup: product.sizeGroup,
     color: product.color ?? undefined,
     truckSpecs: product.truckSpecs ?? undefined,
+    plyRating: plyRating ?? undefined,
+    loadIndex: loadIndex ?? undefined,
     sizes: offers.map((o) => o.size),
     preferredSize,
     price,

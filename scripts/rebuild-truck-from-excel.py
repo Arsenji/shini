@@ -55,11 +55,21 @@ def looks_like_model_token(token: str) -> bool:
     return False
 
 
+SIZE_TOKEN_RE = r"(?:\d{1,3}(?:[.,]\d+)?/\d{2,3}|\d{1,2}(?:[.,]\d+)?)\s*R\s*\d{2}(?:[.,]\d+)?C?"
+
+
 def parse_truck_line(name: str) -> tuple[str, str, str, str]:
     """size, brand, model, truck_specs (слойность, индекс нагрузки и пр.)"""
     name = " ".join(name.split()).replace("\\", "/")
+    # Формат из прайса: 275/70R22.5-18 ... => размер 275/70R22.5, слойность PR18
+    name = re.sub(
+        rf"^({SIZE_TOKEN_RE})-(\d{{1,2}})\s+",
+        r"\1 PR\2 ",
+        name,
+        flags=re.I,
+    )
 
-    m = re.match(r"^([\d.]+\s*R[\d.]+)\s+(.+)$", name, re.I)
+    m = re.match(rf"^({SIZE_TOKEN_RE})\s+(.+)$", name, re.I)
     if m:
         size = normalize_size(m.group(1))
         rest = m.group(2).strip()
@@ -74,14 +84,54 @@ def parse_truck_line(name: str) -> tuple[str, str, str, str]:
             specs = " ".join(tokens[1:]) if len(tokens) > 1 else ""
         return size, brand, model, specs.strip()
 
-    m = re.match(r"^(.+?)\s+([\d.]+\s*R[\d.]+)\s*(.*)$", name, re.I)
+    m = re.match(rf"^(.+?)\s+({SIZE_TOKEN_RE})\s*(.*)$", name, re.I)
     if m:
         brand = m.group(1).strip()
         size = normalize_size(m.group(2))
-        specs = m.group(3).strip()
-        return size, brand, size, specs
+        tail = m.group(3).strip()
+        tail_tokens = tail.split()
+        if tail_tokens and looks_like_model_token(tail_tokens[0]):
+            model = tail_tokens[0]
+            specs = " ".join(tail_tokens[1:])
+        else:
+            model = size
+            specs = tail
+        return size, brand, model, specs
+
+    # Диагональные грузовые: 14.00-20 ..., 11.2-20 ...
+    m = re.match(r"^(\d{1,2}(?:[.,]\d+)?-\d{2}(?:[.,]\d+)?)\s+(.+)$", name, re.I)
+    if m:
+        size = normalize_size(m.group(1))
+        rest = m.group(2).strip()
+        tokens = rest.split()
+        brand = tokens[0] if tokens else rest
+        if len(tokens) >= 2 and looks_like_model_token(tokens[1]):
+            model = tokens[1]
+            specs = " ".join(tokens[2:])
+        else:
+            model = size
+            specs = " ".join(tokens[1:]) if len(tokens) > 1 else ""
+        return size, brand, model, specs.strip()
 
     return name, name, name, ""
+
+
+def extract_ply_rating(text: str) -> str | None:
+    m = re.search(r"\b(\d{1,2})\s*сл\b", text, re.I)
+    if m:
+        return f"{m.group(1)} слоев"
+    m = re.search(r"\b(?:PR\s*(\d{1,2})|(\d{1,2})\s*PR)\b", text, re.I)
+    pr = m.group(1) if m and m.group(1) else (m.group(2) if m else None)
+    if pr:
+        return f"{pr} PR"
+    return None
+
+
+def extract_load_index(text: str) -> str | None:
+    m = re.search(r"\b(\d{2,3}(?:/\d{2,3})?[A-ZА-Я])\b", text, re.I)
+    if not m:
+        return None
+    return m.group(1).upper().replace("К", "K")
 
 
 def load_excel_truck_rows(xlsx: Path) -> list[tuple[str, int, str, str, str, str]]:
@@ -195,6 +245,10 @@ def render_product(p: dict) -> str:
     ]
     if p.get("truckSpecs"):
         body.append(f"    truckSpecs: {ts_string(p['truckSpecs'])},,")
+    if p.get("plyRating"):
+        body.append(f"    plyRating: {ts_string(p['plyRating'])},")
+    if p.get("loadIndex"):
+        body.append(f"    loadIndex: {ts_string(p['loadIndex'])},")
     body.extend(
         [
             f"    price: {p['price']},",
@@ -237,6 +291,8 @@ function renderProduct(p) {{
   if (p.image) lines.push('    image: ' + tsStr(p.image) + ',')
   if (p.color) lines.push('    color: ' + tsStr(p.color) + ',')
   if (p.truckSpecs) lines.push('    truckSpecs: ' + tsStr(p.truckSpecs) + ',')
+  if (p.plyRating) lines.push('    plyRating: ' + tsStr(p.plyRating) + ',')
+  if (p.loadIndex) lines.push('    loadIndex: ' + tsStr(p.loadIndex) + ',')
   if (typeof p.price === 'number') lines.push('    price: ' + p.price + ',')
   if (p.offers?.length) {{
     lines.push('    offers: [')
@@ -267,6 +323,7 @@ def main() -> None:
 
     for raw, price, size, brand, model, specs in rows:
         pid = make_id(brand, model, size, specs, price, legacy, used_ids)
+        full_source = " ".join([brand, model, specs]).strip()
         item: dict = {
             "id": pid,
             "brand": brand,
@@ -277,6 +334,12 @@ def main() -> None:
         }
         if specs:
             item["truckSpecs"] = specs
+        ply = extract_ply_rating(full_source)
+        load = extract_load_index(full_source)
+        if ply:
+            item["plyRating"] = ply
+        if load:
+            item["loadIndex"] = load
         truck_products.append(item)
 
     non_truck = load_non_truck_products()
