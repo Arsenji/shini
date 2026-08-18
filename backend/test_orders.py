@@ -56,8 +56,34 @@ try:
 except ValidationError:
     check("width bounds", True)
 
-ok = OrderCreate(name="Иван", width=205, profile=55, radius=16, phone="8 (999) 123-45-67")
-check("valid OrderCreate", ok.phone == "+79991234567")
+ok = OrderCreate(
+    name="Иван",
+    width=205,
+    profile=55,
+    radius=16,
+    phone="8 (999) 123-45-67",
+    personal_data_consent=True,
+)
+check("valid OrderCreate", ok.phone == "+79991234567" and ok.personal_data_consent is True)
+
+try:
+    OrderCreate(name="Иван", width=205, profile=55, radius=16, phone="+79991234567")
+    check("consent missing rejected", False)
+except ValidationError:
+    check("consent missing rejected", True)
+
+try:
+    OrderCreate(
+        name="Иван",
+        width=205,
+        profile=55,
+        radius=16,
+        phone="+79991234567",
+        personal_data_consent=False,
+    )
+    check("consent false rejected", False)
+except ValidationError:
+    check("consent false rejected", True)
 
 order = OrderData(
     name="Иван",
@@ -65,7 +91,9 @@ order = OrderData(
     profile=55,
     radius=16,
     phone="+79991234567",
-    created_at=datetime(2026, 7, 13, 17, 45),
+    created_at=datetime(2026, 8, 16, 17, 30),
+    personal_data_consent=True,
+    personal_data_consent_at=datetime(2026, 8, 16, 17, 30),
 )
 msg = build_order_message(order)
 check("message has title", "🚗 Новая заявка" in msg)
@@ -73,6 +101,8 @@ check("message has name", "Иван" in msg)
 check("message has size", "205/55 R16" in msg)
 check("message has phone", "+7 (999) 123-45-67" in msg)
 check("message has no status", "Статус" not in msg)
+check("message has consent", "Согласие на обработку ПД: получено" in msg)
+check("message has consent time", "Время согласия: 16.08.2026 17:30" in msg)
 
 order_with_product = OrderData(
     name="Иван",
@@ -103,9 +133,17 @@ class FakeVK:
 
 
 service = OrderService(vk_client=FakeVK())
-created = service.create_order("Иван", 205, 55, 16, "+79991234567")
+created = service.create_order(
+    "Иван",
+    205,
+    55,
+    16,
+    "+79991234567",
+    personal_data_consent=True,
+)
 check("service returns order", created.name == "Иван")
 check("vk message sent", service.vk.sent == 1)
+check("service stores consent", created.personal_data_consent is True)
 
 
 class BrokenVK:
@@ -114,7 +152,14 @@ class BrokenVK:
 
 
 try:
-    OrderService(vk_client=BrokenVK()).create_order("Иван", 205, 55, 16, "+79991234567")
+    OrderService(vk_client=BrokenVK()).create_order(
+        "Иван",
+        205,
+        55,
+        16,
+        "+79991234567",
+        personal_data_consent=True,
+    )
     check("vk failure raises", False)
 except RuntimeError:
     check("vk failure raises", True)
@@ -135,15 +180,48 @@ check("GET /health", health.status_code == 200 and health.json()["status"] == "o
 
 resp = client.post(
     "/api/orders",
-    json={"name": "Иван", "width": 205, "profile": 55, "radius": 16, "phone": "+79991234567"},
+    json={
+        "name": "Иван",
+        "width": 205,
+        "profile": 55,
+        "radius": 16,
+        "phone": "+79991234567",
+        "personal_data_consent": True,
+    },
 )
 check("POST /api/orders 201", resp.status_code == 201, f"got {resp.status_code} {resp.text}")
 body = resp.json() if resp.status_code == 201 else {}
 check("POST success true", body.get("success") is True, str(body))
 
+missing_consent = client.post(
+    "/api/orders",
+    json={"name": "Иван", "width": 205, "profile": 55, "radius": 16, "phone": "+79991234567"},
+)
+check("POST without consent 422", missing_consent.status_code == 422)
+
+false_consent = client.post(
+    "/api/orders",
+    json={
+        "name": "Иван",
+        "width": 205,
+        "profile": 55,
+        "radius": 16,
+        "phone": "+79991234567",
+        "personal_data_consent": False,
+    },
+)
+check("POST consent false 422", false_consent.status_code == 422)
+
 bad = client.post(
     "/api/orders",
-    json={"name": "Иван", "width": 10, "profile": 55, "radius": 16, "phone": "+79991234567"},
+    json={
+        "name": "Иван",
+        "width": 10,
+        "profile": 55,
+        "radius": 16,
+        "phone": "+79991234567",
+        "personal_data_consent": True,
+    },
 )
 check("POST invalid width 422", bad.status_code == 422)
 
@@ -156,7 +234,14 @@ class ServiceWithBrokenVK(OrderService):
 orders_api.OrderService = ServiceWithBrokenVK
 vk_fail = client.post(
     "/api/orders",
-    json={"name": "Иван", "width": 205, "profile": 55, "radius": 16, "phone": "+79993334455"},
+    json={
+        "name": "Иван",
+        "width": 205,
+        "profile": 55,
+        "radius": 16,
+        "phone": "+79993334455",
+        "personal_data_consent": True,
+    },
 )
 check("POST VK failure 502", vk_fail.status_code == 502, f"got {vk_fail.status_code} {vk_fail.text}")
 

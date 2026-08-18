@@ -12,6 +12,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['135/80R12', '175/65R14', '175/70R13', '185/60R14', '185/65R14', '185/70R14', '195/65R15', '205/55R16'],
+    image: '/tires/kama-241.png',
     price: 2900,
     offers: [
       { size: '135/80R12', price: 3000 },
@@ -32,6 +33,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['155/65R13', '155/70R13', '175/65R14', '175/70R13', '185/70R14', '205/55R16', '205/70R15', '215/60R16'],
+    image: '/tires/doublestar-dh05.png',
     price: 3000,
     offers: [
       { size: '155/65R13', price: 3100 },
@@ -52,6 +54,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['155/65R13'],
+    image: '/tires/kama-nk-241.png',
     price: 3300,
     offers: [
       { size: '155/65R13', price: 3300 },
@@ -65,6 +68,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['155/70R13', '175/70R13', '185/60R15', '185/65R14', '185/70R14', '195/55R15', '205/55R16', '205/60R16', '215/65R16'],
+    image: '/tires/doublestar-dh03.png',
     price: 2800,
     offers: [
       { size: '155/70R13', price: 3800 },
@@ -86,7 +90,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['155/70R13', '175/65R14', '175/70R13', '185/65R15', '195/55R16', '195/60R15', '195/65R15', '205/55R16', '205/60R16', '215/65R16'],
-    image: '/tires/formula-energy.jpg',
+    image: '/tires/formula-energy.png',
     price: 4300,
     offers: [
       { size: '155/70R13', price: 4300 },
@@ -109,7 +113,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['155/70R13', '175/65R14', '175/70R13', '175/70R14', '185/60R14', '185/60R15', '185/65R14', '185/65R15', '195/50R15', '195/55R15', '195/55R16', '195/60R15', '205/50R16', '205/55R16', '205/60R16', '205/65R16', '215/60R16', '215/65R16'],
-    image: '/tires/landsail-ls388.webp',
+    image: '/tires/landsail-ls388.png',
     price: 3400,
     offers: [
       { size: '155/70R13', price: 3900 },
@@ -140,6 +144,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['155/70R13', '175/70R14', '185/65R14', '185/70R14'],
+    image: '/tires/matador-mp-47-hectorra3.png',
     price: 4300,
     offers: [
       { size: '155/70R13', price: 4300 },
@@ -156,6 +161,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['155/70R13', '185/65R15'],
+    image: '/tires/mirage-mr-162.png',
     price: 3000,
     offers: [
       { size: '155/70R13', price: 3000 },
@@ -170,6 +176,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['155/70R13'],
+    image: '/tires/sailun-atrezzo-eco.png',
     price: 3500,
     offers: [
       { size: '155/70R13', price: 3500 },
@@ -183,6 +190,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['165/70R13'],
+    image: '/tires/kama-244.png',
     price: 3200,
     offers: [
       { size: '165/70R13', price: 3200 },
@@ -196,6 +204,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['175/65R14', '175/70R13', '175/70R14', '185/55R15', '185/60R15', '185/65R15', '185/70R14', '195/50R15', '195/55R15', '195/65R15', '205/55R16', '205/60R16', '205/70R15', '215/65R16'],
+    image: '/tires/aplus-a609.png',
     price: 2800,
     offers: [
       { size: '175/65R14', price: 2900 },
@@ -222,6 +231,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['175/70R13'],
+    image: '/tires/cordiant-sport-2.png',
     price: 2900,
     offers: [
       { size: '175/70R13', price: 2900 },
@@ -364,7 +374,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['175/65R14', '185/60R14', '185/60R15', '185/65R14', '185/65R15', '185/70R14', '195/65R15', '205/55R16', '205/60R16'],
-    image: '/tires/kumho-es31.webp',
+    image: '/tires/kumho-es31.png',
     price: 4700,
     offers: [
       { size: '175/65R14', price: 4700 },
@@ -669,6 +679,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['185/60R14'],
+    image: '/tires/viatti-v134.png',
     price: 3800,
     offers: [
       { size: '185/60R14', price: 3800 },
@@ -1022,7 +1033,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['195/50R15', '195/55R16', '205/55R16', '205/65R15', '205/65R16', '215/65R16', '215/70R16', '225/70R16'],
-    image: '/tires/delinte-ds2.webp',
+    image: '/tires/delinte-ds2.png',
     price: 4500,
     offers: [
       { size: '195/50R15', price: 5100 },
@@ -1254,6 +1265,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['205/70R15', '245/70R16'],
+    image: '/tires/viatti-v237.png',
     price: 5700,
     offers: [
       { size: '205/70R15', price: 5700 },
@@ -1587,6 +1599,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'passenger',
     sizes: ['205/60R16'],
+    image: '/tires/matador-mp-47-hectorra3.png',
     price: 6500,
     offers: [
       { size: '205/60R16', price: 6500 },
@@ -2083,6 +2096,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'lcv',
     sizes: ['185/75R16C'],
+    image: '/tires/triangle-tr646.png',
     price: 5500,
     offers: [
       { size: '185/75R16C', price: 5500 },
@@ -2096,6 +2110,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'lcv',
     sizes: ['185/75R16C'],
+    image: '/tires/kama-nk243.png',
     price: 5200,
     offers: [
       { size: '185/75R16C', price: 5200 },
@@ -2135,6 +2150,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'lcv',
     sizes: ['185/75R16C'],
+    image: '/tires/three-a-tracvan.png',
     price: 4200,
     offers: [
       { size: '185/75R16C', price: 4200 },
@@ -2200,6 +2216,7 @@ export const shopProducts: ShopProduct[] = [
     season: 'summer',
     imageKey: 'lcv',
     sizes: ['185/75R16C'],
+    image: '/tires/roadstone-cp321.png',
     price: 6000,
     offers: [
       { size: '185/75R16C', price: 6000 },
@@ -2324,6 +2341,7 @@ export const shopProducts: ShopProduct[] = [
     imageKey: 'lcv',
     sizeGroup: '185/75R16C',
     sizes: ['185/75R16C'],
+    image: '/tires/three-a-tracvan.png',
     price: 4200,
     offers: [
       { size: '185/75R16C', price: 4200 },
@@ -2436,6 +2454,7 @@ export const shopProducts: ShopProduct[] = [
     imageKey: 'lcv',
     sizeGroup: '195/75R16C',
     sizes: ['195/75R16C'],
+    image: '/tires/landrock-partner.png',
     price: 8000,
     offers: [
       { size: '195/75R16C', price: 8000 },

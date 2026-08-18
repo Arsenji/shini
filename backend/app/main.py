@@ -75,6 +75,20 @@ if STATIC_DIR.is_dir():
     def spa_root() -> FileResponse:
         return _spa_index()
 
+    def _legal_document(filename: str) -> FileResponse:
+        path = STATIC_DIR / "documents" / filename
+        if path.is_file():
+            return FileResponse(path)
+        return _spa_index()
+
+    @app.get("/privacy-policy", response_model=None)
+    def privacy_policy() -> FileResponse:
+        return _legal_document("privacy-policy.html")
+
+    @app.get("/personal-data-consent", response_model=None)
+    def personal_data_consent() -> FileResponse:
+        return _legal_document("personal-data-consent.html")
+
     @app.get("/{full_path:path}", response_model=None)
     def spa_or_static(full_path: str) -> FileResponse | RedirectResponse:
         """Serve real static files; otherwise fall back to SPA index for client routes."""

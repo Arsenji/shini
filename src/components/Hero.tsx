@@ -14,6 +14,7 @@ export function Hero() {
   const [profile, setProfile] = useState('')
   const [radius, setRadius] = useState('')
   const [phone, setPhone] = useState('')
+  const [consent, setConsent] = useState(false)
   const [status, setStatus] = useState<FormStatus>('idle')
   const [errorMessage, setErrorMessage] = useState('')
 
@@ -40,6 +41,12 @@ export function Hero() {
       return
     }
 
+    if (!consent) {
+      setStatus('error')
+      setErrorMessage('Необходимо дать согласие на обработку персональных данных.')
+      return
+    }
+
     try {
       await createOrder({
         name: safeName,
@@ -47,6 +54,7 @@ export function Hero() {
         profile: safeProfile,
         radius: safeRadius,
         phone: safePhone,
+        personal_data_consent: true,
       })
       setStatus('success')
       setName('')
@@ -54,6 +62,7 @@ export function Hero() {
       setProfile('')
       setRadius('')
       setPhone('')
+      setConsent(false)
     } catch (error) {
       setStatus('error')
       setErrorMessage(error instanceof Error ? error.message : 'Произошла ошибка. Попробуйте позже.')
@@ -169,6 +178,25 @@ export function Hero() {
                 onChange={(e) => setPhone(sanitizePhoneInput(e.target.value))}
                 required
               />
+              <label className="request__consent">
+                <input
+                  type="checkbox"
+                  checked={consent}
+                  onChange={(event) => setConsent(event.target.checked)}
+                />
+                <span>
+                  Я даю согласие на обработку моих персональных данных в соответствии с{' '}
+                  <a href="/personal-data-consent" target="_blank" rel="noreferrer">
+                    Согласием на обработку персональных данных
+                  </a>
+                  .
+                </span>
+              </label>
+              <p className="request__policy">
+                <a href="/privacy-policy" target="_blank" rel="noreferrer">
+                  Политика обработки персональных данных
+                </a>
+              </p>
               {status === 'error' && (
                 <p className="hero__form-feedback hero__form-feedback--error">
                   {errorMessage || 'Произошла ошибка. Попробуйте позже.'}

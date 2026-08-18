@@ -13,6 +13,7 @@ export type OrderPayload = {
   season?: string
   sizes?: string
   product_id?: string
+  personal_data_consent: boolean
 }
 
 export type OrderResponse = {

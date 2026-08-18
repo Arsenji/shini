@@ -2,6 +2,8 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 import { HomePage } from './pages/HomePage'
+import { PersonalDataConsentPage } from './pages/PersonalDataConsentPage'
+import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage'
 import { PublicOfferPage } from './pages/PublicOfferPage'
 import { TireProductPage } from './pages/TireProductPage'
 import { TiresPage } from './pages/TiresPage'
@@ -29,6 +31,8 @@ export default function App() {
           <Route path="/wheels" element={<WheelsPage />} />
           <Route path="/wheels/:id" element={<WheelProductPage />} />
           <Route path="/public-offer" element={<PublicOfferPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/personal-data-consent" element={<PersonalDataConsentPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

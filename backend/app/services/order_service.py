@@ -40,6 +40,8 @@ class OrderData:
     season: str | None = None
     sizes: str | None = None
     product_id: str | None = None
+    personal_data_consent: bool = False
+    personal_data_consent_at: datetime | None = None
 
     @property
     def display_size(self) -> str:
@@ -88,6 +90,15 @@ def build_order_message(order: OrderData) -> str:
             f"Время: {format_datetime(order.created_at)}",
         ]
     )
+
+    if order.personal_data_consent:
+        consent_at = order.personal_data_consent_at or order.created_at
+        lines.extend(
+            [
+                "Согласие на обработку ПД: получено",
+                f"Время согласия: {format_datetime(consent_at)}",
+            ]
+        )
 
     return "\n".join(lines)
 
@@ -165,14 +176,18 @@ class OrderService:
         season: str | None = None,
         sizes: str | None = None,
         product_id: str | None = None,
+        personal_data_consent: bool = False,
     ) -> OrderData:
+        if personal_data_consent is not True:
+            raise ValueError("Необходимо дать согласие на обработку персональных данных")
+        created_at = datetime.now(MSK)
         order = OrderData(
             name=name,
             width=width,
             profile=profile,
             radius=radius,
             phone=phone,
-            created_at=datetime.now(MSK),
+            created_at=created_at,
             size_label=size_label,
             brand=brand,
             model=model,
@@ -180,12 +195,16 @@ class OrderService:
             season=season,
             sizes=sizes,
             product_id=product_id,
+            personal_data_consent=personal_data_consent,
+            personal_data_consent_at=created_at if personal_data_consent else None,
         )
         logger.info(
-            "Sending order to VK: product=%s size=%s phone=%s",
+            "Sending order to VK: product=%s size=%s phone=%s consent=%s consent_at=%s",
             f"{brand or ''} {model or ''}".strip() or "-",
             order.display_size,
             order.phone,
+            order.personal_data_consent,
+            order.personal_data_consent_at.isoformat() if order.personal_data_consent_at else "-",
         )
 
         try:

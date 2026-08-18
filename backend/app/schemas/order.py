@@ -37,6 +37,7 @@ class OrderCreate(BaseModel):
     season: Annotated[str | None, Field(default=None, max_length=32)] = None
     sizes: Annotated[str | None, Field(default=None, max_length=500)] = None
     product_id: Annotated[str | None, Field(default=None, max_length=80)] = None
+    personal_data_consent: bool
 
     @field_validator("name")
     @classmethod
@@ -59,6 +60,13 @@ class OrderCreate(BaseModel):
         if isinstance(value, str):
             return value.strip()
         return value
+
+    @field_validator("personal_data_consent")
+    @classmethod
+    def require_personal_data_consent(cls, value: object) -> bool:
+        if value is not True:
+            raise ValueError("Необходимо дать согласие на обработку персональных данных")
+        return True
 
 
 class OrderCreateResponse(BaseModel):

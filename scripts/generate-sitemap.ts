@@ -23,6 +23,8 @@ const urls = [
   urlEntry(`${SITE_ORIGIN}/`, '1.0'),
   urlEntry(`${SITE_ORIGIN}/tires`, '0.9'),
   urlEntry(`${SITE_ORIGIN}/wheels`, '0.9'),
+  urlEntry(`${SITE_ORIGIN}/privacy-policy`, '0.5', 'yearly'),
+  urlEntry(`${SITE_ORIGIN}/personal-data-consent`, '0.5', 'yearly'),
   ...tireOffers.map((offer) => urlEntry(`${SITE_ORIGIN}${offer.path}`, '0.7')),
   ...wheelOffers.map((offer) => urlEntry(`${SITE_ORIGIN}${offer.path}`, '0.7')),
 ]
