@@ -18,6 +18,11 @@ type ShopCardProps = {
 
 const PREVIEW_SIZES = 2
 
+function getCatalogPreview(image: string | null | undefined): string | null {
+  if (!image) return null
+  return image.replace(/(\.[a-z0-9]+)$/i, '-thumb$1')
+}
+
 function formatPrice(price: number): string {
   return `${price.toLocaleString('ru-RU')} ₽`
 }
@@ -70,6 +75,7 @@ export function ShopCard({ product }: ShopCardProps) {
   const selectedPrice = selectedSize ? getOfferPrice(product, selectedSize) : null
   const hasPrice = typeof selectedPrice === 'number' && selectedPrice > 0
   const hasImage = Boolean(product.image)
+  const previewImage = getCatalogPreview(product.image)
   const hasMoreSizes = offers.length > PREVIEW_SIZES
   const visibleOffers =
     sizesExpanded || !hasMoreSizes ? offers : offers.slice(0, PREVIEW_SIZES)
@@ -128,10 +134,11 @@ export function ShopCard({ product }: ShopCardProps) {
       <div className="shop-card__visual">
         {hasImage ? (
           <img
-            src={product.image!}
+            src={previewImage || product.image!}
             alt={`${product.brand} ${product.model}`}
             className="shop-card__photo"
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <TireIllustration imageKey={product.imageKey} className="shop-card__illustration" />
