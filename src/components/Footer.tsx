@@ -29,9 +29,6 @@ export function Footer() {
             <Link to="/personal-data-consent">Согласие на обработку персональных данных</Link>
             <Link to="/privacy-policy">Политика обработки персональных данных</Link>
             <Link to="/public-offer">Публичная оферта</Link>
-            <a href="/dogovor-podryada-2026.pdf" download>
-              Скачать договор подряда
-            </a>
             <a href="/dogovor-postavki-2026.pdf" download>
               Скачать договор поставки
             </a>
