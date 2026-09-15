@@ -17,10 +17,16 @@ type ShopCardProps = {
 }
 
 const PREVIEW_SIZES = 2
+/** Bump when catalog tire photos are re-normalized in place. */
+const TIRE_IMAGE_CACHE = 'u106'
+
+function withTireCache(url: string): string {
+  return `${url}${url.includes('?') ? '&' : '?'}v=${TIRE_IMAGE_CACHE}`
+}
 
 function getCatalogPreview(image: string | null | undefined): string | null {
   if (!image) return null
-  return image.replace(/(\.[a-z0-9]+)$/i, '-thumb$1')
+  return withTireCache(image.replace(/(\.[a-z0-9]+)$/i, '-thumb$1'))
 }
 
 function formatPrice(price: number): string {
@@ -134,7 +140,7 @@ export function ShopCard({ product }: ShopCardProps) {
       <div className="shop-card__visual">
         {hasImage ? (
           <img
-            src={previewImage || product.image!}
+            src={previewImage || withTireCache(product.image!)}
             alt={`${product.brand} ${product.model}`}
             className="shop-card__photo"
             loading="lazy"

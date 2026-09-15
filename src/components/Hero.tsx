@@ -121,7 +121,7 @@ export function Hero() {
             <form className="hero__form" onSubmit={handleSubmit}>
               <input
                 type="text"
-                placeholder="Имя"
+                placeholder="Введите ваше имя"
                 className="input"
                 value={name}
                 onChange={(e) => setName(sanitizeNameInput(e.target.value))}

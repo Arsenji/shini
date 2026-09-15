@@ -162,7 +162,7 @@ export function RequestForm() {
 
             <input
               type="text"
-              placeholder="Имя"
+              placeholder="Введите ваше имя"
               className="input"
               value={name}
               onChange={(e) => setName(sanitizeNameInput(e.target.value))}
