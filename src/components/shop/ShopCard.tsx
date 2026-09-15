@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom'
 import {
   getOfferPrice,
   getProductOffers,
+  pickPreferredOfferSize,
   shopCategoryLabels,
   shopSeasonLabels,
   type ShopProduct,
+  type ShopSizeFilters,
 } from '../../data/shop'
 import { productToOrderInterest, setOrderInterest } from '../../lib/orderInterest'
 import { canonicalProductOfferPath } from '../../lib/productUrls'
@@ -14,6 +16,8 @@ import { TireIllustration } from './TireIllustration'
 
 type ShopCardProps = {
   product: ShopProduct
+  sizeFilters?: ShopSizeFilters
+  sizeGroup?: string
 }
 
 const PREVIEW_SIZES = 2
@@ -70,11 +74,33 @@ function cleanupTruckSpecs(raw: string, plyRating: string | null, loadIndex: str
     .trim()
 }
 
-export function ShopCard({ product }: ShopCardProps) {
+const emptySizeFilters: ShopSizeFilters = { width: '', profile: '', diameter: '' }
+
+export function ShopCard({
+  product,
+  sizeFilters = emptySizeFilters,
+  sizeGroup = '',
+}: ShopCardProps) {
   const offers = useMemo(() => getProductOffers(product), [product])
-  const [selectedSize, setSelectedSize] = useState(offers[0]?.size ?? product.sizes[0] ?? '')
+  const preferredSize = useMemo(
+    () => pickPreferredOfferSize(product, sizeFilters, sizeGroup),
+    [product, sizeFilters, sizeGroup],
+  )
+  const [selectedSize, setSelectedSize] = useState(preferredSize)
   const [sizesExpanded, setSizesExpanded] = useState(false)
   const [infoOpen, setInfoOpen] = useState(false)
+
+  useEffect(() => {
+    setSelectedSize(preferredSize)
+    setSizesExpanded(false)
+  }, [preferredSize, product.id])
+
+  const orderedOffers = useMemo(() => {
+    if (!preferredSize) return offers
+    const preferred = offers.filter((offer) => offer.size === preferredSize)
+    const rest = offers.filter((offer) => offer.size !== preferredSize)
+    return [...preferred, ...rest]
+  }, [offers, preferredSize])
 
   const categoryLabel = shopCategoryLabels[product.category]
   const seasonLabel = product.season ? shopSeasonLabels[product.season] : null
@@ -82,9 +108,9 @@ export function ShopCard({ product }: ShopCardProps) {
   const hasPrice = typeof selectedPrice === 'number' && selectedPrice > 0
   const hasImage = Boolean(product.image)
   const previewImage = getCatalogPreview(product.image)
-  const hasMoreSizes = offers.length > PREVIEW_SIZES
+  const hasMoreSizes = orderedOffers.length > PREVIEW_SIZES
   const visibleOffers =
-    sizesExpanded || !hasMoreSizes ? offers : offers.slice(0, PREVIEW_SIZES)
+    sizesExpanded || !hasMoreSizes ? orderedOffers : orderedOffers.slice(0, PREVIEW_SIZES)
   const detailsPath = selectedSize ? canonicalProductOfferPath(product, selectedSize) : null
   const { plyRating, loadIndex } = resolveTireSpecs(product)
   const plyLabel = plyRating ? `Слойность: ${plyRating}` : ''

@@ -592,7 +592,12 @@ export function Catalog({
           <>
             <div className="catalog__grid catalog__grid--shop">
               {pageItems.map((product) => (
-                <ShopCard key={product.id} product={product} />
+                <ShopCard
+                  key={product.id}
+                  product={product}
+                  sizeFilters={sizeFilters}
+                  sizeGroup={sizeGroup}
+                />
               ))}
             </div>
 

@@ -1,6 +1,6 @@
 import { shopProducts } from './products'
 import type { ShopCategory, ShopCategoryFilter, ShopProduct, ShopSeason } from './types'
-import { shopCategoryLabels } from './types'
+import { getProductOffers, shopCategoryLabels } from './types'
 
 export * from './types'
 export { shopProducts } from './products'
@@ -382,6 +382,56 @@ export function productMatchesSizeChip(product: ShopProduct, chip: string): bool
   if (!chip) return true
   if (product.sizeGroup === chip) return true
   return product.sizes.includes(chip)
+}
+
+/** Совпадает ли конкретный размер оффера с фильтрами ширины/профиля/диаметра. */
+export function sizeMatchesFilters(size: string, sizeFilters: ShopSizeFilters, category: ShopCategory): boolean {
+  const { width, profile, diameter } = sizeFilters
+  if (!width && !profile && !diameter) return true
+
+  if (category === 'disk') {
+    const part = parseDiskSize(size)
+    if (width && !part.widths.includes(width)) return false
+    if (diameter && !part.diameters.includes(diameter)) return false
+    return true
+  }
+
+  if (isAccessoryCategory(category)) {
+    const part = parseAccessorySize(size)
+    if (width && !part.widths.includes(width)) return false
+    if (diameter && !part.diameters.includes(diameter)) return false
+    return true
+  }
+
+  const part = parseTireSize(size)
+  if (!part) return false
+  if (width && part.width !== width) return false
+  if (profile && part.profile !== profile) return false
+  if (diameter && part.diameter !== diameter) return false
+  return true
+}
+
+/** Размер для предвыбора в карточке: чип размера, иначе совпадение с dropdown-фильтрами. */
+export function pickPreferredOfferSize(
+  product: ShopProduct,
+  sizeFilters: ShopSizeFilters,
+  sizeGroup = '',
+): string {
+  const offers = getProductOffers(product)
+  if (!offers.length) return product.sizes[0] ?? ''
+
+  if (sizeGroup) {
+    const byChip = offers.find((offer) => offer.size === sizeGroup)
+    if (byChip) return byChip.size
+  }
+
+  const hasDimFilters = Boolean(sizeFilters.width || sizeFilters.profile || sizeFilters.diameter)
+  if (hasDimFilters) {
+    const match = offers.find((offer) => sizeMatchesFilters(offer.size, sizeFilters, product.category))
+    if (match) return match.size
+  }
+
+  return offers[0].size
 }
 
 function compareTireSizes(a: string, b: string): number {
