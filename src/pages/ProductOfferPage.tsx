@@ -65,7 +65,7 @@ export function ProductOfferPage({ offer, notFoundPath, notFoundLabel }: Product
           <div className="product-page__visual">
             {product.image ? (
               <img
-                src={`${product.image}${product.image.includes('?') ? '&' : '?'}v=u106`}
+                src={`${product.image}${product.image.includes('?') ? '&' : '?'}v=u164`}
                 alt={formatOfferTitle(offer)}
                 className="product-page__photo"
               />

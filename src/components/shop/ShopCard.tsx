@@ -22,7 +22,7 @@ type ShopCardProps = {
 
 const PREVIEW_SIZES = 2
 /** Bump when catalog tire photos are re-normalized in place. */
-const TIRE_IMAGE_CACHE = 'u106'
+const TIRE_IMAGE_CACHE = 'u164'
 
 function withTireCache(url: string): string {
   return `${url}${url.includes('?') ? '&' : '?'}v=${TIRE_IMAGE_CACHE}`
@@ -184,7 +184,7 @@ export function ShopCard({
         </div>
 
         <h3 className="shop-card__brand">{product.brand}</h3>
-        <p className="shop-card__model">{product.model}</p>
+        <p className="shop-card__model">{product.model.trim()}</p>
 
         {offers.length > 0 && (
           <div className="shop-card__size-picker" role="group" aria-label="Размеры">
