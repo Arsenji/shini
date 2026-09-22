@@ -22,7 +22,7 @@ type ShopCardProps = {
 
 const PREVIEW_SIZES = 2
 /** Bump when catalog tire photos are re-normalized in place. */
-const TIRE_IMAGE_CACHE = 'u234'
+const TIRE_IMAGE_CACHE = 'u240'
 
 function withTireCache(url: string): string {
   return `${url}${url.includes('?') ? '&' : '?'}v=${TIRE_IMAGE_CACHE}`

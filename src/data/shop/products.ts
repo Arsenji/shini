@@ -6449,7 +6449,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '155/702R13',
     sizes: ['155/702R13'],
     badge: 'Шипы',
-    image: '/tires/nordman-5-winter.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     price: 5900,
     offers: [
       { size: '155/702R13', price: 5900 },
@@ -6482,7 +6482,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '175/70R13',
     sizes: ['175/70R13'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     loadIndex: '82T',
     price: 5200,
     offers: [
@@ -6499,7 +6499,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '175/70R13',
     sizes: ['175/70R13'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '82T',
     price: 5700,
     offers: [
@@ -6684,7 +6684,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '175/65R14',
     sizes: ['175/65R14'],
     badge: 'Шипы',
-    image: '/tires/ikon-nordman-sx3.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '86T',
     price: 6100,
     offers: [
@@ -6701,7 +6701,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '175/65R14',
     sizes: ['175/65R14'],
     badge: 'Шипы',
-    image: '/tires/ikon-nordman-sx3.jpg',
+    image: '/tires/ikon-nordman-8-winter.jpg',
     loadIndex: '86T',
     price: 6500,
     offers: [
@@ -6785,7 +6785,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '175/65R14',
     sizes: ['175/65R14'],
     badge: 'Шипы',
-    image: '/tires/ikon-nordman-sx3.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     price: 5100,
     offers: [
       { size: '175/65R14', price: 5100 },
@@ -7050,7 +7050,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '175/70R14',
     sizes: ['175/70R14'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '88T',
     price: 6100,
     offers: [
@@ -7131,7 +7131,7 @@ export const shopProducts: ShopProduct[] = [
     imageKey: 'passenger',
     sizeGroup: '185/60R14',
     sizes: ['185/60R14'],
-    image: '/tires/dunlop-sp-touring-t1.jpg',
+    image: '/tires/dunlop-sp-winter-ice-02-winter.jpg',
     loadIndex: '82T',
     price: 6500,
     offers: [
@@ -7231,7 +7231,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/60R14',
     sizes: ['185/60R14'],
     badge: 'Шипы',
-    image: '/tires/ikon-nordman-sx3.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     price: 5100,
     offers: [
       { size: '185/60R14', price: 5100 },
@@ -7328,7 +7328,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/65R14',
     sizes: ['185/65R14'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '90T',
     price: 6400,
     offers: [
@@ -7345,7 +7345,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/65R14',
     sizes: ['185/65R14'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     loadIndex: '90T',
     price: 5500,
     offers: [
@@ -7411,7 +7411,7 @@ export const shopProducts: ShopProduct[] = [
     imageKey: 'passenger',
     sizeGroup: '185/65R14',
     sizes: ['185/65R14'],
-    image: '/tires/nordman-5-winter.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     loadIndex: '90T',
     price: 5700,
     offers: [
@@ -7428,7 +7428,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/65R14',
     sizes: ['185/65R14'],
     badge: 'Шипы',
-    image: '/tires/nordman-7-winter.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '90T',
     price: 6500,
     offers: [
@@ -7597,7 +7597,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/70R14',
     sizes: ['185/70R14'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     loadIndex: '92T',
     price: 6000,
     offers: [
@@ -7614,7 +7614,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/70R14',
     sizes: ['185/70R14'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     price: 6500,
     offers: [
       { size: '185/70R14', price: 6500 },
@@ -7797,7 +7797,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/55R15',
     sizes: ['185/55R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-nordman-sx3.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     loadIndex: '86T',
     price: 5700,
     offers: [
@@ -7932,7 +7932,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/60R15',
     sizes: ['185/60R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     price: 5700,
     offers: [
       { size: '185/60R15', price: 5700 },
@@ -7948,7 +7948,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/60R15',
     sizes: ['185/60R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '88T',
     price: 6200,
     offers: [
@@ -7965,7 +7965,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/60R15',
     sizes: ['185/60R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-8-winter.jpg',
     loadIndex: '88T',
     price: 7000,
     offers: [
@@ -8065,7 +8065,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/65R15',
     sizes: ['185/65R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '92T',
     price: 6700,
     offers: [
@@ -8082,7 +8082,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '185/65R15',
     sizes: ['185/65R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-nordman-sx3.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     loadIndex: '92T',
     price: 5400,
     offers: [
@@ -8265,7 +8265,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '195/55R15',
     sizes: ['195/55R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-nordman-sx3.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     price: 6850,
     offers: [
       { size: '195/55R15', price: 6850 },
@@ -8348,7 +8348,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '195/60R15',
     sizes: ['195/60R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-nordman-sx3.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '92T',
     price: 6400,
     offers: [
@@ -8365,7 +8365,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '195/60R15',
     sizes: ['195/60R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     price: 5700,
     offers: [
       { size: '195/60R15', price: 5700 },
@@ -8446,7 +8446,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '195/65R15',
     sizes: ['195/65R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     loadIndex: '95T',
     price: 6000,
     offers: [
@@ -8463,7 +8463,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '195/65R15',
     sizes: ['195/65R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '95T',
     price: 6500,
     offers: [
@@ -8480,7 +8480,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '195/65R15',
     sizes: ['195/65R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-8-winter.jpg',
     loadIndex: '95T',
     price: 7400,
     offers: [
@@ -8647,7 +8647,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '205/70R15',
     sizes: ['205/70R15'],
     badge: 'Шипы',
-    image: '/tires/ikon-nordman-sx3.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     price: 7500,
     offers: [
       { size: '205/70R15', price: 7500 },
@@ -9091,7 +9091,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '205/55R16',
     sizes: ['205/55R16'],
     badge: 'Шипы',
-    image: '/tires/dunlop-sp-touring-t1.jpg',
+    image: '/tires/dunlop-sp-winter-ice-02-winter.jpg',
     loadIndex: '94T',
     price: 7800,
     offers: [
@@ -9108,7 +9108,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '205/55R16',
     sizes: ['205/55R16'],
     badge: 'Шипы',
-    image: '/tires/dunlop-sp-touring-t1.jpg',
+    image: '/tires/dunlop-sp-winter-ice-03-winter.jpg',
     loadIndex: '94T',
     price: 9400,
     offers: [
@@ -9190,7 +9190,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '205/55R16',
     sizes: ['205/55R16'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     loadIndex: '94T',
     price: 6200,
     offers: [
@@ -9207,7 +9207,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '205/55R16',
     sizes: ['205/55R16'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '94T',
     price: 7400,
     offers: [
@@ -9224,7 +9224,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '205/55R16',
     sizes: ['205/55R16'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-8-winter.jpg',
     loadIndex: '94T',
     price: 8100,
     offers: [
@@ -9473,7 +9473,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '205/60R16',
     sizes: ['205/60R16'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-5-winter.jpg',
     loadIndex: '96T',
     price: 7200,
     offers: [
@@ -9490,7 +9490,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '205/60R16',
     sizes: ['205/60R16'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-7-winter.jpg',
     loadIndex: '96T',
     price: 7700,
     offers: [
@@ -9507,7 +9507,7 @@ export const shopProducts: ShopProduct[] = [
     sizeGroup: '205/60R16',
     sizes: ['205/60R16'],
     badge: 'Шипы',
-    image: '/tires/ikon-character-eco.jpg',
+    image: '/tires/ikon-nordman-8-winter.jpg',
     loadIndex: '96T',
     price: 8500,
     offers: [
