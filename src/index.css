@@ -779,11 +779,11 @@ select.input {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-width: 140px;
+  min-width: 120px;
   padding: 12px 18px;
   border: none;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--navy);
   font-family: var(--font);
   font-size: 14px;
   font-weight: 600;
@@ -795,7 +795,7 @@ select.input {
   border-left: 1px solid var(--border);
 }
 
-.catalog__season-btn:hover:not(.catalog__season-btn--active) {
+.catalog__season-btn:hover:not(.catalog__season-btn--active):not(:disabled) {
   background: rgba(27, 45, 69, 0.06);
   color: var(--navy);
 }
@@ -810,12 +810,44 @@ select.input {
   color: var(--navy);
 }
 
-.catalog__season-icon--summer {
-  color: #e67e22;
+.catalog__season-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
-.catalog__season-icon--winter {
-  color: #3b82c4;
+.catalog__season-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  line-height: 0;
+}
+
+.catalog__season-icon svg {
+  display: block;
+}
+
+.catalog__season-icon--all {
+  position: relative;
+  overflow: hidden;
+}
+
+.catalog__season-icon-half {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* «Все»: левая половина снежинки + правая половина солнца */
+.catalog__season-icon-half--winter {
+  clip-path: inset(0 50% 0 0);
+}
+
+.catalog__season-icon-half--summer {
+  clip-path: inset(0 0 0 50%);
 }
 
 .catalog__dims {
@@ -1094,11 +1126,19 @@ select.input {
   box-shadow: var(--shadow-lg);
 }
 
-.shop-card__badge {
+.shop-card__labels {
   position: absolute;
-  top: 16px;
-  left: 16px;
+  top: 14px;
+  left: 14px;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: calc(100% - 56px);
+}
+
+.shop-card__badge {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -1107,6 +1147,18 @@ select.input {
   color: var(--navy);
   padding: 4px 10px;
   border-radius: var(--radius-pill);
+}
+
+.shop-card__stock {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: linear-gradient(135deg, #1b3a5c, var(--navy));
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 6px 14px rgba(15, 35, 60, 0.22);
+  white-space: nowrap;
 }
 
 .shop-card__info-link {
@@ -1227,6 +1279,18 @@ select.input {
   mix-blend-mode: multiply;
 }
 
+.shop-card__axle {
+  margin: 0 0 10px;
+  padding: 0;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--navy);
+  min-height: 1.35em;
+}
+
 .shop-card__info {
   padding: 22px;
   display: flex;
@@ -1239,6 +1303,7 @@ select.input {
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 8px;
+  min-height: 1.2em;
 }
 
 .shop-card__category,
@@ -1254,17 +1319,30 @@ select.input {
   color: var(--gold);
 }
 
+.shop-card__title {
+  min-height: calc(18px * 1.2 * 2);
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 .shop-card__brand {
   font-size: 18px;
   font-weight: 800;
   color: var(--navy);
   line-height: 1.2;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .shop-card__model {
   font-size: 14px;
   color: var(--text-muted);
-  margin: 2px 0 4px;
+  margin: 2px 0 0;
   min-height: 1.35em;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1291,6 +1369,8 @@ select.input {
   flex-wrap: wrap;
   gap: 6px;
   margin-bottom: 14px;
+  min-height: 30px;
+  align-content: flex-start;
 }
 
 .shop-card__size-chip {

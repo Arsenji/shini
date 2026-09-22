@@ -65,7 +65,7 @@ export function ProductOfferPage({ offer, notFoundPath, notFoundLabel }: Product
           <div className="product-page__visual">
             {product.image ? (
               <img
-                src={`${product.image}${product.image.includes('?') ? '&' : '?'}v=u164`}
+                src={`${product.image}${product.image.includes('?') ? '&' : '?'}v=u166`}
                 alt={formatOfferTitle(offer)}
                 className="product-page__photo"
               />
@@ -76,7 +76,15 @@ export function ProductOfferPage({ offer, notFoundPath, notFoundLabel }: Product
 
           <div className="product-page__content">
             <p className="product-page__meta">
-              {[categoryLabel, seasonLabel, product.badge, product.color].filter(Boolean).join(' · ')}
+              {[
+                categoryLabel,
+                seasonLabel,
+                product.badge,
+                product.color,
+                product.stockRemaining ? `остаток ${product.stockRemaining} шт` : null,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
             </p>
             <h1 className="product-page__title">{formatOfferTitle(offer)}</h1>
             <p className="product-page__price">

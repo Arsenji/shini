@@ -11,7 +11,7 @@ import {
 } from '../../data/shop'
 import { productToOrderInterest, setOrderInterest } from '../../lib/orderInterest'
 import { canonicalProductOfferPath } from '../../lib/productUrls'
-import { resolveTireSpecs } from '../../lib/tireSpecs'
+import { resolveTireSpecs, resolveApplication, resolveAxle, displayProductTitle, isRedundantRimSpec } from '../../lib/tireSpecs'
 import { TireIllustration } from './TireIllustration'
 
 type ShopCardProps = {
@@ -22,7 +22,7 @@ type ShopCardProps = {
 
 const PREVIEW_SIZES = 2
 /** Bump when catalog tire photos are re-normalized in place. */
-const TIRE_IMAGE_CACHE = 'u164'
+const TIRE_IMAGE_CACHE = 'u234'
 
 function withTireCache(url: string): string {
   return `${url}${url.includes('?') ? '&' : '?'}v=${TIRE_IMAGE_CACHE}`
@@ -113,8 +113,12 @@ export function ShopCard({
     sizesExpanded || !hasMoreSizes ? orderedOffers : orderedOffers.slice(0, PREVIEW_SIZES)
   const detailsPath = selectedSize ? canonicalProductOfferPath(product, selectedSize) : null
   const { plyRating, loadIndex } = resolveTireSpecs(product)
+  const { brand: titleBrand, model: titleModel } = displayProductTitle(product)
+  const application = resolveApplication(product)
+  const axle = resolveAxle(product)
   const plyLabel = plyRating ? `Слойность: ${plyRating}` : ''
   const loadLabel = loadIndex ? `Индекс: ${loadIndex}` : ''
+  const applicationLabel = application ? `Назначение: ${application}` : ''
   const truckSpecsRaw = product.truckSpecs?.trim() ?? ''
   const truckSpecsClean = cleanupTruckSpecs(truckSpecsRaw, plyRating, loadIndex)
   const plyVariants = plyRating
@@ -126,7 +130,8 @@ export function ShopCard({
     : []
   const loadVariants = loadIndex ? [compactSpec(loadIndex)] : []
   const showTruckSpecs = truckSpecsClean
-    ? !plyVariants.includes(compactSpec(truckSpecsRaw)) &&
+    ? !isRedundantRimSpec(truckSpecsClean, selectedSize, sizeGroup || product.sizeGroup) &&
+      !plyVariants.includes(compactSpec(truckSpecsRaw)) &&
       !loadVariants.includes(compactSpec(truckSpecsRaw))
     : false
   const detailsLine = product.color ?? (showTruckSpecs ? truckSpecsClean : '')
@@ -146,13 +151,20 @@ export function ShopCard({
 
   return (
     <article className="shop-card">
-      {product.badge && <span className="shop-card__badge">{product.badge}</span>}
+      {(product.badge || product.stockRemaining) && (
+        <div className="shop-card__labels">
+          {product.stockRemaining ? (
+            <span className="shop-card__stock">Остаток {product.stockRemaining} шт</span>
+          ) : null}
+          {product.badge ? <span className="shop-card__badge">{product.badge}</span> : null}
+        </div>
+      )}
 
       {detailsPath && (
         <a
           href={detailsPath}
           className="shop-card__info-link"
-          aria-label={`Информация: ${product.brand} ${product.model}`}
+          aria-label={`Информация: ${titleBrand} ${titleModel}`}
           title="Информация о товаре"
           onClick={(event) => {
             event.preventDefault()
@@ -167,7 +179,7 @@ export function ShopCard({
         {hasImage ? (
           <img
             src={previewImage || withTireCache(product.image!)}
-            alt={`${product.brand} ${product.model}`}
+            alt={`${titleBrand} ${titleModel}`}
             className="shop-card__photo"
             loading="lazy"
             decoding="async"
@@ -183,8 +195,12 @@ export function ShopCard({
           {seasonLabel && <span className="shop-card__season">{seasonLabel}</span>}
         </div>
 
-        <h3 className="shop-card__brand">{product.brand}</h3>
-        <p className="shop-card__model">{product.model.trim()}</p>
+        <div className="shop-card__title">
+          <h3 className="shop-card__brand">{titleBrand}</h3>
+          {titleModel.trim() && titleModel.trim() !== titleBrand.trim() && (
+            <p className="shop-card__model">{titleModel.trim()}</p>
+          )}
+        </div>
 
         {offers.length > 0 && (
           <div className="shop-card__size-picker" role="group" aria-label="Размеры">
@@ -214,6 +230,8 @@ export function ShopCard({
         {detailsLine && <p className="shop-card__color">{detailsLine}</p>}
         {plyLabel && <p className="shop-card__color">{plyLabel}</p>}
         {loadLabel && <p className="shop-card__color">{loadLabel}</p>}
+        {applicationLabel && <p className="shop-card__color">{applicationLabel}</p>}
+        {axle && <p className="shop-card__axle">{axle}</p>}
 
         <div className="shop-card__footer">
           <span className={hasPrice ? 'shop-card__price' : 'shop-card__price-note'}>
@@ -252,12 +270,12 @@ export function ShopCard({
               ×
             </button>
             <p className="shop-card__popup-meta">
-              {[categoryLabel, seasonLabel, detailsLine, plyLabel, loadLabel]
+              {[categoryLabel, seasonLabel, axle, detailsLine, plyLabel, loadLabel, applicationLabel]
                 .filter(Boolean)
                 .join(' · ')}
             </p>
             <p className="shop-card__popup-title">
-              {product.brand} {product.model}
+              {titleBrand} {titleModel}
             </p>
             {selectedSize && <p className="shop-card__popup-size">Размер: {selectedSize}</p>}
             <p className="shop-card__popup-price">

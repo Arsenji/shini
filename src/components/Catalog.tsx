@@ -111,7 +111,7 @@ export function Catalog({
 
   const defaultCategory: ShopCategoryFilter = mode === 'wheels' ? 'disk' : 'all'
   const [category, setCategory] = useState<ShopCategoryFilter>(defaultCategory)
-  const [season, setSeason] = useState<ShopSeason>('summer')
+  const [season, setSeason] = useState<ShopSeason | 'all'>('all')
   const [sizeFilters, setSizeFilters] = useState<ShopSizeFilters>(emptySizeFilters)
   const [sizeGroup, setSizeGroup] = useState('')
   const [diskColor, setDiskColor] = useState('')
@@ -221,6 +221,7 @@ export function Catalog({
 
   useEffect(() => {
     setCategory(defaultCategory)
+    setSeason('all')
     setSizeGroupsExpanded(false)
     setDiskColor('')
     setSizeFilters(emptySizeFilters)
@@ -228,6 +229,14 @@ export function Catalog({
     setPage(1)
   }, [mode, defaultCategory])
 
+  useEffect(() => {
+    // У грузовых нет сезонности — всегда показываем весь раздел
+    if (activeCategory === 'truck' && season !== 'all') {
+      setSeason('all')
+    }
+  }, [activeCategory, season])
+
+  const seasonLockedToAll = activeCategory === 'truck'
   useEffect(() => {
     if (sizeGroup && !allSizeChips.includes(sizeGroup)) {
       setSizeGroup('')
@@ -347,6 +356,7 @@ export function Catalog({
                     onClick={() => {
                       setCategory(filter)
                       setSizeGroup('')
+                      if (filter === 'truck') setSeason('all')
                     }}
                   >
                     {filter === 'all' && mode === 'tires'
@@ -363,21 +373,91 @@ export function Catalog({
             <div className="catalog__season-toggle" role="group" aria-label="Сезон">
               <button
                 type="button"
+                className={`catalog__season-btn ${season === 'all' ? 'catalog__season-btn--active' : ''}`}
+                onClick={() => setSeason('all')}
+                aria-pressed={season === 'all'}
+              >
+                <span className="catalog__season-icon catalog__season-icon--all" aria-hidden="true">
+                  <span className="catalog__season-icon-half catalog__season-icon-half--winter">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                      <g fill="none" stroke="#3b82c4" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 2.5v19M4.2 7.2l15.6 9.6M4.2 16.8l15.6-9.6" />
+                        <path d="M12 5.2l-1.8 1.8M12 5.2l1.8 1.8M12 18.8l-1.8-1.8M12 18.8l1.8-1.8" />
+                        <path d="M6 8.6l2.2.15M6 8.6l1.05 1.9M18 15.4l-2.2-.15M18 15.4l-1.05-1.9" />
+                        <path d="M6 15.4l2.2-.15M6 15.4l1.05-1.9M18 8.6l-2.2.15M18 8.6l-1.05 1.9" />
+                      </g>
+                      <circle cx="12" cy="12" r="1.6" fill="#3b82c4" />
+                    </svg>
+                  </span>
+                  <span className="catalog__season-icon-half catalog__season-icon-half--summer">
+                    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                      <circle cx="12" cy="12" r="4.1" fill="#e67e22" />
+                      <path
+                        d="M12 2.6v2.3M12 19.1v2.3M2.6 12h2.3M19.1 12h2.3M5.5 5.5l1.6 1.6M16.9 16.9l1.6 1.6M5.5 18.5l1.6-1.6M16.9 7.1l1.6-1.6"
+                        fill="none"
+                        stroke="#e67e22"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </span>
+                </span>
+                Все
+              </button>
+              <button
+                type="button"
                 className={`catalog__season-btn ${season === 'summer' ? 'catalog__season-btn--active' : ''}`}
-                onClick={() => setSeason('summer')}
+                onClick={() => {
+                  if (!seasonLockedToAll) setSeason('summer')
+                }}
+                aria-pressed={season === 'summer'}
+                aria-disabled={seasonLockedToAll}
+                disabled={seasonLockedToAll}
+                title={
+                  seasonLockedToAll
+                    ? 'У грузовых шин нет сезонности'
+                    : undefined
+                }
               >
                 <span className="catalog__season-icon catalog__season-icon--summer" aria-hidden="true">
-                 ☀
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4.1" fill="#e67e22" />
+                    <path
+                      d="M12 2.6v2.3M12 19.1v2.3M2.6 12h2.3M19.1 12h2.3M5.5 5.5l1.6 1.6M16.9 16.9l1.6 1.6M5.5 18.5l1.6-1.6M16.9 7.1l1.6-1.6"
+                      fill="none"
+                      stroke="#e67e22"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                    />
+                  </svg>
                 </span>
                 Летние
               </button>
               <button
                 type="button"
                 className={`catalog__season-btn ${season === 'winter' ? 'catalog__season-btn--active' : ''}`}
-                onClick={() => setSeason('winter')}
+                onClick={() => {
+                  if (!seasonLockedToAll) setSeason('winter')
+                }}
+                aria-pressed={season === 'winter'}
+                aria-disabled={seasonLockedToAll}
+                disabled={seasonLockedToAll}
+                title={
+                  seasonLockedToAll
+                    ? 'У грузовых шин нет сезонности'
+                    : undefined
+                }
               >
                 <span className="catalog__season-icon catalog__season-icon--winter" aria-hidden="true">
-                 ❄
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                    <g fill="none" stroke="#3b82c4" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2.5v19M4.2 7.2l15.6 9.6M4.2 16.8l15.6-9.6" />
+                      <path d="M12 5.2l-1.8 1.8M12 5.2l1.8 1.8M12 18.8l-1.8-1.8M12 18.8l1.8-1.8" />
+                      <path d="M6 8.6l2.2.15M6 8.6l1.05 1.9M18 15.4l-2.2-.15M18 15.4l-1.05-1.9" />
+                      <path d="M6 15.4l2.2-.15M6 15.4l1.05-1.9M18 8.6l-2.2.15M18 8.6l-1.05 1.9" />
+                    </g>
+                    <circle cx="12" cy="12" r="1.6" fill="#3b82c4" />
+                  </svg>
                 </span>
                 Зимние
               </button>

@@ -61,6 +61,21 @@ export type ShopProduct = {
   plyRating?: string | null
   /** Индекс нагрузки + скорость (например "100T", "120/121R") */
   loadIndex?: string | null
+  /**
+   * Назначение шины (например "универ.", "универсальная") —
+   * показывается рядом с индексом, не в названии.
+   */
+  application?: string | null
+  /**
+   * Ось: «рулевая ось» / «ведущая ось» —
+   * лейбл под фото; из названия рул./вед. убирается.
+   */
+  axle?: string | null
+  /**
+   * Остаток на складе (шт), если указан в прайсе — например "(3шт)".
+   * Показывается лейблом на карточке.
+   */
+  stockRemaining?: number | null
 }
 
 export type ShopCategoryFilter = 'all' | ShopCategory
